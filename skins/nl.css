@@ -1,0 +1,12 @@
+/* This is the same default-skin with rounded corners for embedding in NL startpage */
+@import "default.css";
+body      { background-color: #222;
+            color: #ddd; }
+
+#inner    { background-color:#656565; color: #fff;
+            padding:6px;
+            border: 1px solid #777;
+}
+
+#backcrumb { top:2.85em; }
+

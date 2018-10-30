@@ -1,0 +1,51 @@
+/* default colors. Based on icecast-streampage colors */
+
+body          { background-color: #656565; color: #fff;  }
+
+#inner  { margin-top:2em; }
+
+#topnav { position:fixed; top:0; left:0; width:100%; }
+
+#dimmer       { color: #fff; }
+
+button        { background-color: #565656; color:#F8FE64; border: 1px solid #333; }
+button:hover  { background-color: #737373; color:#FFFFFF; }
+
+a                       { color: #F8EF64; }
+a:hover, a:focus        { background-color: #737373; color: #fff; }
+
+#add tr:hover, 
+#playlist tr:hover      { background-color: #737373; }
+
+.hilight      { background-color: #444; }
+
+.shuffle .filelink { color:#ccc; }
+
+tt            { background-color: #444; color: #dfd; border: 1px dashed #666 }
+
+.dirlink      { color: #5FF; }
+
+.desc         { color: #aaa; }
+
+.artist       { color: #dfd; }
+
+.track        { color: #dff; }
+
+.album        { color: #ddf; }
+
+.file         { color: #ddd; }
+
+.time         { color: #fff; }
+
+#progress     { border: 1px solid #aaa; }
+
+#progress_inn { background-color: #999; }
+
+#info { background-color:#555; border:2px solid #585858; border-radius: 3px; }
+
+#backcrumb          { background-color:#444; }
+#backcrumb .dirlink { border-left:1px dashed #666; }
+
+#searchbox, #streambox, #searchbutton, #streambutton, #streambookmarks { background-color: #444; border:1px solid black; color:#fff; }
+
+

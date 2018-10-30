@@ -1,0 +1,53 @@
+/* Colors From Default-Skin */
+@import "default.css";
+
+/* but bigger size, for fullscreen HD-display */
+
+body          { font-size:1.9em; }
+
+table         { font-size: 62.5%; }
+
+td, th        { font-size: 1.2em;} 
+
+.small        { padding:0.4em; }
+
+.doublesmall  { width: 5em; }
+
+#backcrumb .dirlink {
+    border-left:1px dashed #666;
+    min-width:1.5em;
+    font-size:1.2em;
+}
+
+#songinfo {
+    margin-top:2em;
+    min-height:12em;
+    padding: 0.4em 0;
+}
+
+#songinfo tr {
+    line-height:3em;
+}
+
+.artist, .track, .album {
+    font-size:1.75em;
+}
+
+.time {
+    line-height:15em;
+}
+
+
+#controls button {
+    width:2.5em;
+    font-size:1.25em;
+}
+
+#searchbox, #searchbutton, #streambox, #streambutton { font-size:1em; }
+
+.dirlink, .filelink {
+    padding:0.3em;
+    font-size:1.3em;
+}
+
+#topnav button { font-size: 1em; }

@@ -1,0 +1,45 @@
+#topnav button.hilight { font-weight:bold; }
+
+body { background-color: #111; background-image:url(bluridark1920x1080.jpg); background-attachment:fixed; color:#dfdbd2; font-size:200%; }
+
+#beta { display: none; }
+
+a { color: #F8EF64; }
+
+a:hover, a:focus { color: #fff; }
+
+#add tr:hover, #playlist tr:hover { background-color: #00616e; }
+
+#topnav { position:fixed; top:0; left:0; width:100%; background-color:#333230; }
+#topnav .hilight { font-weight:bold; }
+
+#inner { margin-top:2em; }
+#inner .hilight { background-color: #083035; }
+
+tt { background-color: #444; color: #dfd; border: 1px dashed #666 }
+
+.dirlink { color: #5FF; }
+.desc    { color: #aaa; }
+.artist  { color: #dfd; }
+.track   { color: #dff; }
+.album   { color: #ddf; }
+.file    { color: #ddd; }
+.time    { color: #fff; }
+
+.artist, .track { font-size:140%; padding: 0 0.5em;}
+.album          { font-size:110%; padding: 0 0.5em;}
+.file, .time    { padding: 1em; }
+.dirlink, .filelink { padding-top:0.2em; padding-bottom:0.2em; }
+.shuffle .filelink  { color:#ccc; }
+
+#songinfo { font-size:125%; }
+
+#progress     { border: 1px solid #00616e; opacity:0.5; }
+
+#progress_inn { background-color: #083035; opacity:0.8; }
+
+#searchbox, #streambox, #streambookmarks { color: #dfdbd2; }
+
+#backcrumb          { }
+#backcrumb .dirlink:hover    { background-color:#00616e; }
+#backcrumb .dirlink { border-left:1px dashed #666; }
