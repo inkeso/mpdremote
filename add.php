@@ -359,6 +359,7 @@ if (isset($_SESSION['dir']) && $_SESSION['dir'] == "") echo <<<HTML
             <option value="http://stream.saetche.net:8000/echochamber">Saetchmo Echochamber</option>
             <option value="http://ice.somafm.com/dronezone">SomaFM Drone Zone</option>
             <option value="http://ice.somafm.com/groovesalad">SomaFM Groove Salad</option>
+            <option value="http://mp3channels.rockantenne.hamburg/917xfm">917XFM</option>
         </select>
     </div>
 

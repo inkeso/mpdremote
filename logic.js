@@ -77,7 +77,8 @@ function dispatch(what) {
             var answer = req.responseText;
             if (req.status == 200 && answer.length > 2) {
                 document.getElementById('inner').innerHTML = answer;
-                window.scrollTo(0,0);
+                // main content changes (no action is dispatched): scroll to top.
+                if (what.indexOf("?action=") == -1) window.scrollTo(0,0);
                 if (what.indexOf('controls.php') == 0)  {
                     document.getElementById("progress").onclick = jump;
                     gTimer = setTimeout('dispatch("controls.php")', 1000);

@@ -183,9 +183,14 @@ function addfiles($mpd, $fi) {
 function addfiles_do($mpd, $fi) {
     // Add single file or dir.
     if (is_string($fi)) {
-        $dir = $mpd->GetDir($fi); // yes, this works on files as well
-        foreach($dir['directories'] as $k=>$v) addfiles_do($mpd, $v);
-        foreach($dir['files'] as $k=>$v) $mpd->PLAdd($v['file']);
+        // what about streams?
+        if (substr($fi, 0, 7 ) === "http://") {
+            $mpd->PLAdd($fi);
+        } else {
+            $dir = $mpd->GetDir($fi); // yes, this works on files as well
+            foreach($dir['directories'] as $k=>$v) addfiles_do($mpd, $v);
+            foreach($dir['files'] as $k=>$v) $mpd->PLAdd($v['file']);
+        }
     }
     
     // Add array of files
