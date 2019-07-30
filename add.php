@@ -67,7 +67,7 @@ if (isset($_GET['search'])) {
     $listing = array();
     $resi = $mpclient->Search(MPD_SEARCH_ANY, $_SESSION['search']);
     if (isset($resi['files'])) foreach ($resi['files'] as $key => $val) {
-        $listing[$val['file']] = array(mkTitle($val), hrTime($val['Time']));
+        $listing[$val['file']] = array(mkTitle($val), humanTime($val['Time']));
     }
     
     // crumbtrail Music » "keyword"
@@ -96,7 +96,7 @@ if (isset($_GET['search'])) {
     }
     foreach ($dir['files'] as $d) {
         // mkTitle(.., true) should not be neccessary, if everything is tagged right
-        $listing[$d['file']] = array(mkTitle($d,true), hrTime($d['Time']));
+        $listing[$d['file']] = array(mkTitle($d,true), humanTime($d['Time']));
     }
     
     // bonus: add real streams
@@ -158,7 +158,7 @@ if (isset($_GET['search'])) {
             $rkeys = array_keys($resi);
             natcasesort($rkeys);
             foreach ($rkeys as $key) {
-                $listing[$key] = array($resi[$key][0], hrTime($resi[$key][1]));
+                $listing[$key] = array($resi[$key][0], humanTime($resi[$key][1]));
             }
             $crumbtrail = array("genre=" => "by Genre", 
                                 "genre=".urlencode($_SESSION['genre']) => $_SESSION['genre'],
@@ -168,7 +168,7 @@ if (isset($_GET['search'])) {
             if (isset($resi['files'])) foreach ($resi['files'] as $key => $val) {
                 $tit = $val['Title'];
                 if (isset($val['Album'])) $tit .= " [".$val['Album']."]";
-                $listing[$val['file']] = array($tit, hrTime($val['Time']));
+                $listing[$val['file']] = array($tit, humanTime($val['Time']));
             }
             $crumbtrail = array("artist=" => "by Artist", 
                                 "artist=".urlencode($_SESSION['artist']) => $_SESSION['artist']);
@@ -360,6 +360,7 @@ if (isset($_SESSION['dir']) && $_SESSION['dir'] == "") echo <<<HTML
             <option value="http://ice.somafm.com/dronezone">SomaFM Drone Zone</option>
             <option value="http://ice.somafm.com/groovesalad">SomaFM Groove Salad</option>
             <option value="http://mp3channels.rockantenne.hamburg/917xfm">917XFM</option>
+            <option value="http://stream-relay-geo.ntslive.net/stream">NTS</option>
         </select>
     </div>
 

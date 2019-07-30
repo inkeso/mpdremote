@@ -23,7 +23,7 @@ tt { background-color: #444; color: #dfd; border: 1px dashed #666 }
 .artist  { color: #dfd; }
 .track   { color: #dff; }
 .album   { color: #ddf; }
-.file    { color: #ddd; }
+.file    { color: #ddd; font-size:80%; }
 .time    { color: #fff; }
 
 .artist, .track { font-size:140%; padding: 0 0.5em;}

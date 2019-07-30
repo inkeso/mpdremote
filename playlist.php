@@ -64,7 +64,7 @@ if (isset($_GET["con"])) {
         $counter += 1;
         if (!is_numeric($key)) continue;
         $title = " ".mkTitle($val);
-        $playtime = hrTime($val['Time']); // ['Id']
+        $playtime = humanTime($val['Time']); // ['Id']
         if ($ctid == $key) echo "\e[48;5;23m"; // current track background-color
         if (in_array($val['Id'], $mpmids)) {
             echo "\e[37m"; // shuffle track color [white]
@@ -93,7 +93,7 @@ foreach($mpclient->playlist as $key=>$val) {
     if (!is_numeric($key)) continue;
     
     $title = mkTitle($val, false);
-    $playtime = hrTime($val['Time']); // ['Id']
+    $playtime = humanTime($val['Time']); // ['Id']
     $b1 = ($ctid == $key) ? 'hilight' : '';
     if (in_array($val['Id'], $mpmids)) $b1.= ' shuffle';
     if ($mod > 0) {

@@ -58,13 +58,13 @@ function checkToken($token) {
     if (strpos($tline, " for ")) {
         $duration = substr($tline, strpos($tline, " for ")+5);
         file_put_contents($tfile, "Token valid until ".(time()+$duration));
-        return hrTime($duration);
+        return humanTime($duration);
     }
     
     if (strpos($tline, " until ")) {
         $valid = substr($tline, strpos($tline, " until ")+7)+0;
         if ($valid > time()) {
-            return hrTime($valid-time());
+            return humanTime($valid-time());
         } else {
             unlink($tfile);
             $_SESSION = array();
@@ -104,7 +104,7 @@ function mkTitle($val, $forceFile=false) {
     return $title;
 }
 
-function hrTime($sec) {
+function humanTime($sec) {
     $h = intval($sec / 3600);
     $m = intval(($sec - $h*3600) / 60);
     $s = $sec % 60;

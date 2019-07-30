@@ -57,8 +57,8 @@ if ($mpclient->state == MPD_STATE_PLAYING || $mpclient->state == MPD_STATE_PAUSE
     $album = $mpclient->playlist[$ctid]['Album'];
     $filen = $mpclient->playlist[$ctid]['file'];
     if ($filen == $track) $track = substr($filen, strrpos($filen,"/")+1,-4);
-    $cpos  = hrTime($mpclient->current_track_position);
-    $clen  = hrTime($mpclient->current_track_length);
+    $cpos  = humanTime($mpclient->current_track_position);
+    $clen  = humanTime($mpclient->current_track_length);
     $cperc = @intval(($mpclient->current_track_position / $mpclient->current_track_length)*100);
 }
 
@@ -95,11 +95,11 @@ if ($mod > 0) echo <<<OUTPUT
 
 OUTPUT;
 
-
 if (isset($_SESSION['token']) && $vtok = checkToken($_SESSION['token'])) echo <<<OUTPUT
 
     <div id="guestticket">Fahrschein noch gültig: $vtok</div>
 
 OUTPUT;
+
 
 ?>

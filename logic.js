@@ -134,7 +134,7 @@ function addstreambookmark() {
 }
 
 function addstream(uri) {
-    if (uri.indexOf("http://") === 0) {
+    if (uri.indexOf("http://") === 0 || uri.indexOf("https://") === 0) {
         confirm("Add »"+uri+"« to playlist?") && dispatch('add.php?action=addfile&p=' + escape(uri));
     } else {
         alert("Not a valid stream-URL");
