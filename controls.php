@@ -60,6 +60,15 @@ if ($mpclient->state == MPD_STATE_PLAYING || $mpclient->state == MPD_STATE_PAUSE
     $cpos  = humanTime($mpclient->current_track_position);
     $clen  = humanTime($mpclient->current_track_length);
     $cperc = @intval(($mpclient->current_track_position / $mpclient->current_track_length)*100);
+} else {
+    $ctid  = 0;
+    $artst = "-";
+    $track = "-";
+    $album = "-";
+    $filen = 0;
+    $cpos  = humanTime(0);
+    $clen  = humanTime(0);
+    $cperc = 0;
 }
 
 $mpclient->Disconnect();
