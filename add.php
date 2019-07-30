@@ -85,21 +85,26 @@ if (isset($_GET['search'])) {
     $crumbtrail = array();
     
     $dir = $mpclient->GetDir($_SESSION['dir']);
-    foreach ($dir['directories'] as $d) {
-        $sd = strrpos("$d","/");
-        if ($sd === False) {
-            $sd = $d;
-        } else {
-            $sd = substr($d,$sd+1);
+    if (!is_null($dir) && array_key_exists('directories', $dir)) {
+    
+        foreach ($dir['directories'] as $d) {
+            $sd = strrpos("$d","/");
+            if ($sd === False) {
+                $sd = $d;
+            } else {
+                $sd = substr($d,$sd+1);
+            }
+            $listing[$d] = array($sd, "DIR");
         }
-        $listing[$d] = array($sd, "DIR");
     }
-    foreach ($dir['files'] as $d) {
-        // mkTitle(.., true) should not be neccessary, if everything is tagged right
-        $listing[$d['file']] = array(mkTitle($d,true), humanTime($d['Time']));
+    if (!is_null($dir) && array_key_exists('files', $dir)) {
+        foreach ($dir['files'] as $d) {
+            // mkTitle(.., true) should not be neccessary, if everything is tagged right
+            $listing[$d['file']] = array(mkTitle($d,true), humanTime($d['Time']));
+        }
     }
     
-    // bonus: add real streams
+    // bonus: add real streams to streamfolder
     if ($_GET['dir'] == "streams") {
         $doc = new DOMDocument();
         $doc->Load("http://www.musicforprogramming.net/rss.php");

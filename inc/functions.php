@@ -28,8 +28,9 @@ function maymod() {
     $validIP = preg_match($allowIP, getenv('REMOTE_ADDR'));
     if ($validIP) return 2;
     
-    $validToken = checkToken($_SESSION['token']);
-    if ($validToken) return 1;
+    if (array_key_exists('token', $_SESSION) && checkToken($_SESSION['token'])) {
+        return 1;
+    }
     
     return 0;
 }
