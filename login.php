@@ -1,5 +1,5 @@
 <div id="songinfo">
-<form method="POST" name="sform" action="login">
+<form method="POST" name="sform" action="index.php">
     <table style="margin:auto;">
         <tr><td colspan="2"><center><b>Dauernutzer-login</b></center></td></tr>
         <tr><td>Benutzername:</td><td><input type="user" size="20" name="usr" value=""/></td></tr>
