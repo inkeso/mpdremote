@@ -23,6 +23,18 @@
 // for session and so on
 require_once ("inc/header.php");
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_SESSION['token'] = $_POST["token"];
+    // TODO: Fahrscheinautomat
+    $hash = $users[$_POST["usr"]];
+    if ($hash === crypt($_POST["pw"], $hash)) {
+        // store user and hashed PW in Session
+        $_SESSION['usr'] = $_POST["usr"];
+        $_SESSION['pwd'] = $hash;
+    }
+    header ("Location: index.php");
+}
+
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>

@@ -931,7 +931,7 @@ class mpd {
         if (isset($this->COMPATIBILITY_MAX_TBL[$cmd])){
             $req_ver_hi = $this->COMPATIBILITY_MAX_TBL[$cmd];   
         } else {
-            $req_ver_hi = "0.20.0";
+            $req_ver_hi = "0.22.0";
         }
 
         $mpd_ver = $this->_computeVersionValue($this->mpd_version);

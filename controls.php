@@ -62,10 +62,10 @@ if ($mpclient->state == MPD_STATE_PLAYING || $mpclient->state == MPD_STATE_PAUSE
     $cperc = @intval(($mpclient->current_track_position / $mpclient->current_track_length)*100);
 } else {
     $ctid  = 0;
-    $artst = "-";
-    $track = "-";
-    $album = "-";
-    $filen = 0;
+    $artst = "";
+    $track = "Silence...";
+    $album = "";
+    $filen = "";
     $cpos  = humanTime(0);
     $clen  = humanTime(0);
     $cperc = 0;
