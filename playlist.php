@@ -46,6 +46,8 @@ if (isset($_GET["action"]) && ($mod > 0)) {
 // Get current playing ID (Playlist-index)
 if ($mpclient->state == MPD_STATE_PLAYING || $mpclient->state == MPD_STATE_PAUSED) {
     $ctid = $mpclient->current_track_id;
+} else {
+    $ctid = "";
 }
 
 // Get IDs added by MusicPlayerMagic (only the last few, because IDs wrap to 0 at 5535)

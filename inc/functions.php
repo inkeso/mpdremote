@@ -141,7 +141,7 @@ function getMPMids() {
 // before shuffle. but it doesn't hurt.
 
 function apl_service($on) {
-    $stream = stream_socket_client("tcp://localhost:55443", $errno, $errstr);
+    $stream = @stream_socket_client("tcp://localhost:55443", $errno, $errstr);
     $res = false;
     if ($stream) {
         fwrite($stream, "config apl service ".($on ? "True" : "False"));
