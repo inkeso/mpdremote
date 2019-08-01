@@ -29,7 +29,6 @@ if (isset($_GET["action"]) && ($mod > 0)) {
         case "play":
             $mpclient->SkipTo($_GET['p']);
             if ($mpclient->state != MPD_STATE_PLAYING) $mpclient->Play();
-            header ("Location: controls.php");
             break;
         case "del":
             $mpclient->PLRemove($_GET['p']);
