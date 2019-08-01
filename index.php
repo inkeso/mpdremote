@@ -24,13 +24,14 @@
 require_once ("inc/header.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION['token'] = $_POST["token"];
-    // TODO: Fahrscheinautomat
-    $hash = $users[$_POST["usr"]];
-    if ($hash === crypt($_POST["pw"], $hash)) {
-        // store user and hashed PW in Session
-        $_SESSION['usr'] = $_POST["usr"];
-        $_SESSION['pwd'] = $hash;
+    if (isset($_POST["token"])) $_SESSION['token'] = $_POST["token"];
+    if (isset($_POST["usr"]) && isset($_POST["pw"]) && array_key_exists($_POST["usr"], $users)) {
+        $hash = $users[$_POST["usr"]];
+        if ($hash === crypt($_POST["pw"], $hash)) {
+            // store user and hashed PW in Session
+            $_SESSION['usr'] = $_POST["usr"];
+            $_SESSION['pwd'] = $hash;
+        }
     }
     header ("Location: index.php");
 }
