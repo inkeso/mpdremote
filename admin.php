@@ -103,5 +103,13 @@ echo mkLink("newToken=3600", "60 Minuten")." &ndash; ";
 echo mkLink("newToken=7200", "2 Stunden")." &ndash; ";
 echo mkLink("newToken=14400", "4 Stunden")." &ndash; ";
 echo mkLink("newToken=86400","24 Stunden")."\n";
-echo "<hr/></div></body></head>";
+echo "<hr/>";
+
+echo "<h3>Password-hash generieren</h3>";
+echo '<form method="POST">Password: <input type="text" name="pw"/>';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pw'])) {
+    echo "<tt>".password_hash($_POST['pw'], PASSWORD_DEFAULT)."</tt>";
+    echo "(nach inc/config.php pasten)";
+}
+echo "</form></div></body></head>";
 ?>

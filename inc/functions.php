@@ -14,24 +14,14 @@ function maymod() {
     0 - not authorized
     1 - Token is valid (guest user)
     2 - Lokal IP
-    3 - Admin
+    3 - Logged in user
     */
     global $users;
     global $allowIP;
     
-    if (isset($_SESSION['usr']) && isset($_SESSION['pwd'])) {
-        $validAdmin = (isset($users[$_SESSION['usr']]) && 
-                      ($users[$_SESSION['usr']] === $_SESSION['pwd']));
-        if ($validAdmin) return 3;
-    }
-    
-    $validIP = preg_match($allowIP, getenv('REMOTE_ADDR'));
-    if ($validIP) return 2;
-    
-    if (array_key_exists('token', $_SESSION) && checkToken($_SESSION['token'])) {
-        return 1;
-    }
-    
+    if (isset($_SESSION['usr']) && array_key_exists($_SESSION['usr'], $users)) return 3;
+    if (preg_match($allowIP, getenv('REMOTE_ADDR'))) return 2;
+    if (array_key_exists('token', $_SESSION) && checkToken($_SESSION['token'])) return 1;
     return 0;
 }
 
