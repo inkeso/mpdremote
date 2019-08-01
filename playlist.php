@@ -82,23 +82,20 @@ if (isset($_GET["con"])) {
         echo "$title \e[38;5;247m[\e[38;5;255m$playtime\e[38;5;247m] \e[0m\n";
     }
 } else { // HTML
+    echo '<div id="playlist"><table cellspacing="0" cellpadding="0" width="100%">';
 
-echo <<<OUTPUT
-    <div id="playlist"><table cellspacing="0" cellpadding="0" width="100%">
-OUTPUT;
-
-$counter = -1;
-foreach($mpclient->playlist as $key=>$val) {
-    $counter += 1;
-    $stripes = (($counter % 4) > 1) ? "oddrow" : "evenrow";
-    if (!is_numeric($key)) continue;
-    
-    $title = mkTitle($val, false);
-    $playtime = humanTime($val['Time']); // ['Id']
-    $b1 = ($ctid == $key) ? 'hilight' : '';
-    if (in_array($val['Id'], $mpmids)) $b1.= ' shuffle';
-    if ($mod > 0) {
-        echo <<<OUTPUT
+    $counter = -1;
+    foreach($mpclient->playlist as $key=>$val) {
+        $counter += 1;
+        $stripes = (($counter % 4) > 1) ? "oddrow" : "evenrow";
+        if (!is_numeric($key)) continue;
+        
+        $title = mkTitle($val, false);
+        $playtime = humanTime($val['Time']); // ['Id']
+        $b1 = ($ctid == $key) ? 'hilight' : '';
+        if (in_array($val['Id'], $mpmids)) $b1.= ' shuffle';
+        if ($mod > 0) {
+            echo <<<OUTPUT
     <tr class="$b1 $stripes">
         <td>
             <div class="nobreak">
@@ -116,9 +113,9 @@ foreach($mpclient->playlist as $key=>$val) {
         </td>
     </tr>
 OUTPUT;
-    } else { // Non-privileged
-        echo <<<OUTPUT
-    <tr $b1>
+        } else { // Non-privileged
+            echo <<<OUTPUT
+    <tr class="$b1 $stripes">
         <td width="100%">
             $title
         </td>
@@ -129,13 +126,10 @@ OUTPUT;
         </td>
     </tr>
 OUTPUT;
+        }
     }
-}
 
-echo <<<OUTPUT
-    </table>
-    </div>
-OUTPUT;
+    echo '</table></div>';
 }
 
 $mpclient->Disconnect();
