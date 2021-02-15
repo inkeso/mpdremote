@@ -21,22 +21,23 @@ Response ist ein JSON-String.
 
 Die Hauptstruktur sowohl für die aktuelle Titelanzeige als auch für die
 Playlist und die Dateiliste sieht so aus:
+```
+TRACKINFO ::= {
+    'Id': playlist-id,
+    'file': "full/path/to/file.mp3",
+    'Artist': "Unknown Artist",
+    'Title': "Unknown Title",
+    'Album': "Unknown Album",
+    'Track': "12",             # Kann auch "8/14" sein o.ä.
+    'Time': "351",             # Liedlänge in Sekunden
 
-> TRACKINFO ::= {
->     'Id': playlist-id,
->     'file': "full/path/to/file.mp3",
->     'Artist': "Unknown Artist",
->     'Title': "Unknown Title",
->     'Album': "Unknown Album",
->     'Track': "12",             # Kann auch "8/14" sein o.ä.
->     'Time': "351",             # Liedlänge in Sekunden
->
->     ... und mehr, je nachdem, welche Tags am Start sind.
->
->     'fromshuffle': true         # wenn vom Shuffle hiunzugefügt.
->     'inplaylist': 1             # Position in der playlist relativ
->                                 # zum aktuellen Track.
-> }
+    # ... und mehr, je nachdem, welche Tags am Start sind.
+
+    'fromshuffle': true         # wenn vom Shuffle hiunzugefügt.
+    'inplaylist': 1             # Position in der playlist relativ
+                                # zum aktuellen Track.
+}
+```
 
 Dabei ist die Anwesenheit der Elemente nicht garantiert.
 
