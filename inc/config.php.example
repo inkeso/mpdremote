@@ -1,0 +1,71 @@
+<?php
+
+  ///////////////////////
+ // MPD-configuration //
+///////////////////////
+
+define("MPDCONFIG", array(
+    'host' => 'localhost',
+    'port' => 6600,
+    'password' => null
+));
+
+// MusicPlayerMagic feeds the playlist and listens here...
+// Just used for coloring playlist-entries
+define("MPMAGICONF", array(
+    'host' => 'localhost',
+    'port' => 55443
+));
+
+// when adding large dir, limit to n files.
+define("MAXFILESADD", 500);
+
+// Tab-separated files containing single streams and podcast-rss-feeds or soundcloud-links.
+// Location doesn't matter as long as php can read it (i.e. may be outside of music-dir)
+define("STREAMBOOKMARKS", "/srv/files/musik/streams/bookmarks");
+define("PODCASTS", "/srv/files/musik/streams/podcasts");
+
+  ///////////////////////
+ //  Access-controll  //
+///////////////////////
+
+define("ACCESS", array(
+    // IPs matching this RegExp are allowed to control the player without login.
+    'allowIP' => '/^(127\.0\.0\.1|192\.168\.[0-9]{1,3}\.[0-9]{1,3}$/',
+
+    // a named array of users and their hashed passwords, which are allowed
+    // to control the player even from a non-local URL.
+    // use password_hash() to generate it. e.g.:
+    // php -r 'echo password_hash("password", PASSWORD_DEFAULT)."\n";'
+    'users' => array(
+        'admin' => '$2y$10$4Gn5jZs.J12B4gHJ88wCP.JpBkJUVsrfElh22GMRD0aIbXdGyUNBS',
+    )
+
+));
+
+  ///////////////////////
+ //    Soundcloud     //
+///////////////////////
+
+define("SOUNDCLOUDAPI", "0123456789abcdefghijklmnopqrstuv");
+// get your API-key from https://developers.soundcloud.com/
+// you should also set this key (or a different one) in mpd.conf:
+/*
+playlist_plugin {
+    name "soundcloud"
+    enabled "true"
+    apikey "0123456789abcdefghijklmnopqrstuv"
+}
+*/
+
+  ///////////////////////
+ //  Error reporting  //
+///////////////////////
+
+// I'm trying to not generate any notices or warnings, so show everything.
+error_reporting(E_ALL);
+
+// But do not show them, only print to log.
+ini_set('display_errors', "Off");
+
+?>

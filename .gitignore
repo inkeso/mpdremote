@@ -1,4 +1,2 @@
-old
-tokens
-testpage.php
-inc/mpd.slim.class.php
+miniplayer.php
+inc/config.php

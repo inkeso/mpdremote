@@ -1,0 +1,143 @@
+/***  Base Layout for everything. No Colors & fonts here! (see skins/*.css) ***/
+
+/* ***  MAIN LAYOUT  ************************************************ */
+
+body {
+    margin:0;
+    padding:0;
+}
+
+#cbuttons, #guestticket, #playlist, #add, #login {
+    display: none;
+}
+
+#dimmer {
+    position:fixed;
+    width:100%;
+    height:100%;
+    left:0;
+    top:0;
+    padding-top:40%;
+    text-align:center;
+    z-index:-2;
+    opacity:0;
+}
+
+#tabs {
+    margin:0;
+    padding:0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: 'c p a';
+}
+
+#tabs button {
+    display: block;
+}
+
+#tabs button#b_ctr { grid-area: c; }
+#tabs button#b_pls { grid-area: p; }
+#tabs button#b_add { grid-area: a; }
+
+td.progress {
+    width: 100%;
+}
+
+#cbuttons {
+    text-align:center;
+}
+
+button {
+    display: inline-block;
+}
+
+
+/* ***  CONTROLS  *************************************************** */
+#cinfo {
+    margin:0;
+    padding:0;
+    display: grid;
+    grid-template-columns: 4.5em 1fr auto;
+    grid-template-rows: repeat(7, max-content);
+}
+
+#cinfo .desc         { grid-column: 1; display: flex; align-items: center; }
+#cinfo #artist,
+#cinfo #track,
+#cinfo #album        { grid-column: 2; display: flex; align-items: center; }
+#cinfo #albumart     { grid-column: 3; grid-row: 1 / span 3; }
+#cinfo #progressline,
+#cinfo #file,
+#cinfo #nextup       { grid-column: 2 / span 2; }
+#cinfo #file span    { cursor: pointer; }
+#cinfo #nextup       { cursor: pointer; }
+#cinfo #nextup:hover { text-decoration: line-through; }
+#cinfo #nextup.nohover      { cursor: default; }
+#cinfo #nextup.nohover:hover{ text-decoration: none; }
+#cinfo #cbuttons,
+#cinfo #guestticket  { grid-column: 1 / span 3; }
+
+
+@media  (max-height: 430px) {
+    #cinfo #file        { grid-column: 2; }
+    #cinfo #albumart    { grid-row: 1 / span 4; }
+}
+
+
+#cinfo #progressline, #cinfo #progressline * {
+    margin:0;
+    padding:0;
+    height: 1em;
+    line-height: 1em;
+}
+#cinfo #progressline #progress     { height: 100%; cursor:url(skins/skip.cur), crosshair; }
+#cinfo #progressline #progress_inn {  }
+#cinfo #progressline #curtime      { position: relative; z-index:-2; top: -1em; padding-left:0.2em; }
+#cinfo #progressline #tottime      { position: relative; z-index:-2; top: -2em; padding-right:0.2em; text-align:right; }
+
+#cinfo #progress_hover { position: absolute; z-index:2; display: none}
+#cinfo #progress:hover #progress_hover { display: block; }
+
+
+/* ***  PLAYLIST  *************************************************** */
+
+#playlist div.box {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    display: grid;
+    grid-template-columns: min-content 1fr max-content;
+    grid-template-areas: 'delete title time';
+    align-items: center;
+    /* width: calc(100vw - 11.5mm);*/
+}
+
+#playlist div.box div  { height:min-content; }
+
+#playlist button.boxdel { grid-area: delete; text-align:center; }
+#playlist div.boxinner  { grid-area: title;  overflow:hidden; }
+#playlist div.boxtime   { grid-area: time;   text-align:right; }
+
+
+
+/* ***  ADD  ******************************************************** */
+#add #search {
+    display: block;
+}
+
+#add #itemlist .row {
+    display: grid;
+    grid-template-columns: 3.1em 1fr 3.1em;
+    align-items: center;
+}
+
+#add #itemlist .refresh { grid-column: 1; text-align:center; }
+#add #itemlist .track   { grid-column: 1; text-align:right; overflow:hidden; }
+#add #itemlist .line    { grid-column: 2; display: flex; align-items: center; height: 100%; }
+#add #itemlist .lfile   { grid-column: 2; }
+#add #itemlist .adddir  { grid-column: 3; text-align:center; }
+#add #itemlist .time    { grid-column: 3; text-align:right; }
+
+/* ***  LOGIN  ****************************************************** */
+#login { text-align: center; }
+

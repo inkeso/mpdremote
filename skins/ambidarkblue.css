@@ -1,0 +1,54 @@
+/* re-use default-themw, just redefine some colors and spacings */
+@import url("default.css");
+
+:root {
+    --tabs-bg: #000;
+    --main-bg: #222;
+    --main-text: #ddd;
+    --dim-text: #888;
+    --folder-text: #0DF;
+    --remove-text: #F44;
+
+    --button-bg: #111;
+    --button-text: #ddd;
+    --button-border: #333;
+
+    --hover-bg: #224F54;
+    --pg-full: #00E5FF20;
+}
+
+
+#playlist div.hilight, #add .inplaylist {
+    background: #143D42;
+}
+#playlist div.box {
+    color:#FF6;
+}
+#playlist div.box.shuffle {
+    color:var(--main-text);
+}
+#add #crumbtrail button {
+    background: var(--main-bg);
+}
+#add #crumbtrail button:hover {
+    background: var(--hover-bg);
+}
+
+#cinfo {
+    grid-gap: 1em 0;
+    padding-top:0.5em;
+}
+
+#albumart img {
+    filter:brightness(40%);
+    transition: all .5s;
+}
+
+#albumart img:hover {
+    filter:none;
+    opacity:1;
+}
+
+#artist, #track, #title, #file {
+    word-break: break-word; /* needed mainly for webkit */
+}

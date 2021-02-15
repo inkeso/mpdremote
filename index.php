@@ -1,36 +1,170 @@
-<?php 
+<?php
 
 require_once ("inc/header.php");
 
+$skin = getSkin();
+$mod = maymod();
+
+
+//<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+//<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>mpd:re:mote</title>
+    <title>mpd:r3mote</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="Cache-Control" content="must-revalidate" />
     <meta http-equiv="Cache-Control" content="no-cache" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="Expires" content="-1" />
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-    <LINK REL="SHORTCUT ICON" HREF="mpdremote2.png">
-    <script type="text/javascript" src="logic.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="layout.css" />
+    <link rel="stylesheet" type="text/css" href="skins/<?=$skin?>.css" />
+    <script type="text/javascript" src="jks.js"></script>
+    <script type="text/javascript" src="playlist.js"></script>
+    <script type="text/javascript" src="add.js"></script>
+    <script type="text/javascript" src="dynamic.js"></script>
+    <script type="text/javascript"><!--
 
-    <link rel="stylesheet" type="text/css" href="skins/layout.css" />
-    <link rel="stylesheet" type="text/css" href="skins/<?php echo $skin; ?>.css" />
+// |||=========================================================================\
+// ||| This is dirty and should be removed at some point, because there
+// ··· _are_ precision touch-devices out there (but not in our userbase)
+function pointercheck() {
+    // since pointer-related mediaqueries may not be accurate
+    // (looking at you, IceCat!)
+    // we first check whether we can create a touchevent...
+    let istouch = true;
+    try {
+        document.createEvent("TouchEvent");
+    } catch (e) {
+        istouch = false;
+    }
+    // ...then we check whether mediaquery matches
+    if (istouch && window.matchMedia("(pointer: fine)").matches) {
+        // conflict! use larger boxes to be on the safe side.
+        // since we do not want any styles in JS, we have to find all
+        // media queries for a coarse pointer and update them.
+        for (let styles of document.styleSheets) {
+            for (let rule of styles.cssRules) {
+                if (rule instanceof CSSMediaRule) {
+                    if (rule.conditionText && rule.conditionText.includes("pointer: coarse")) {
+                        rule.media.appendMedium("(pointer: fine)");
+                    }
+                }
+            }
+        }
+    }
+}
+pointercheck();
+// ---=========================================================================/
+
+
+
+
+function showcontrols() {
+    show("controls");
+    updatecurrent();
+    ctupdate = window.setInterval(updatecurrent, 1000);
+}
+
+function showplaylist() {
+    show("playlist");
+    updateplaylist();
+    ctupdate = window.setInterval(updateplaylist, 5000);
+}
+
+<?php if ($mod == 0) { ?>
+function linkify(path) { return path.escapeHtml(); }
+<?php } ?>
+
+// see also add.js
+function showadd() {
+    <?php if ($mod > 0) { ?>
+        show("add");
+        if (adder.lifu === null) {
+            fetch("podcastnames", null, e => {adder.podcasts = e});
+            adder.goto();
+        } else {
+            adder.lifu();
+        }
+    <?php } else { ?>
+        show("login");
+        $('#login').style.display="block";
+    <?php } ?>
+}
+
+// autostart after load
+document.addEventListener('DOMContentLoaded', event => {
+    <?php if ($mod > 0) { ?>
+        $("#progress").addEventListener("click", skip);
+        $("#progress").addEventListener("mousemove", updatetooltip);
+        $('#search').addEventListener("keyup", adder.searchkey);
+        $('#cbuttons').style.display = "block";
+        playlist.readonly = false;
+    <?php } else { ?>
+        $('#b_add').innerHTML = "Login";
+    <?php } ?>
+    showcontrols();
+    playlist.initialize();
+});
+
+--></script>
 </head>
 <body>
-    <!-- i'm so beta -->
-    <div id="beta" style="position:fixed; z-index:-10; width:100%; height:100%; margin:0; padding:0; border:none; 
-                background-image:url(skins/beta.png); background-repeat:no-repeat; background-position:center 40px;"></div>
-    <!-- remove when grown up lol -->
-
     <div id="dimmer">Moment...</div>
-    <div id="topnav">
-        <button id="controls_tab" onclick="dispatch('controls.php')">Controls</button><button id="playlist_tab" onclick="dispatch('playlist.php')">Playlist</button><button id="add_tab" onclick="dispatch('add.php')">Add Song</button>
+    <div id="tabs">
+        <button id="b_ctr" onclick="showcontrols();">Controls</button>
+        <button id="b_pls" onclick="showplaylist();">Playlist <span id="plcount"></span></button>
+        <button id="b_add" onclick="showadd();">Add Song</button>
     </div>
-    <div id="inner"></div>
+    <div id="controls" button="b_ctr">
+        <div id="cinfo">
+            <div class="desc">Artist</div><div id="artist"></div><div id="albumart" onclick="toggleinfo()"></div>
+            <div class="desc">Title</div> <div id="track"></div>
+            <div class="desc">Album</div> <div id="album"></div>
+            <div class="desc">File</div>  <div id="file"></div>
+            <div class="desc">Time</div>
+
+            <div id="progressline">
+                <div id="progress">
+                    <div id="progress_inn" style="width:0%">
+                        <div id="progress_hover">0:00:00</div>
+                    </div>
+                </div>
+                <div id="curtime"></div>
+                <div id="tottime"></div>
+            </div>
+            <div class="desc">Next</div>    <div id="nextup"<?php if ($mod > 0) {
+                    ?> onclick="action('rm', this.attributes.trackid, updatecurrent);"<?php
+                } else {
+                    ?> class="nohover"<?php
+                } ?>></div>
+        </div>
+        <div id="cbuttons">
+            <button onclick="action('prev');">fast_rewind</button>
+            <button id="playbutton" onclick="action('pause');">pause</button>
+            <button onclick="action('next');">fast_forward</button>
+        </div>
+
+        <div id="guestticket">Fahrschein noch gültig: </div>
+    </div>
+
+    <div id="playlist" button="b_pls"></div>
+
+    <div id="add" button="b_add">
+        <div id="crumbtrail"></div>
+        <input id="search" name="search" placeholder="Suche..."/>
+        <div id="itemlist"></div>
+    </div>
+
+    <div id="login" button="b_add">
+        <form action="" method="post">
+        <br/><input type="text" name="usr" placeholder="User"/>
+        <br/><input type="password" name="pw" placeholder="Password"/>
+        <br/><input type="submit" value="login"/>
+        </form>
+    </div>
+
+    <div id="errors"></div>
 </body>
-<script type="text/javascript">
-    // initial dispatch, yo
-    dispatch("controls.php");
-</script>
 </html>

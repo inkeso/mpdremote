@@ -1,51 +1,366 @@
-/* default colors. Based on icecast-streampage colors */
+/***  Define Colors & Font  ***************************************** */
 
-body          { background-color: #656565; color: #fff;  }
+:root {
+    --tabs-bg: #111111;
+    --main-bg: #555555;
 
-#inner  { margin-top:2em; }
+    --main-text: #EEEEEE;
+    --dim-text: #999999;
+    --folder-text: #87ECFF;
+    --remove-text: #FE7064;
 
-#topnav { position:fixed; top:0; left:0; width:100%; }
+    --button-bg: #454545;
+    --button-text: #F8FE64;
+    --button-border: #333333;
 
-#dimmer       { color: #fff; }
+    --hover-bg: #666666;
 
-button        { background-color: #565656; color:#F8FE64; border: 1px solid #333; }
-button:hover  { background-color: #737373; color:#FFFFFF; }
+    /* for progress-bar */
+    --pg-empty: #00000020;
+    --pg-full: #FFFFFF20;
+}
 
-a                       { color: #F8EF64; }
-a:hover, a:focus        { background-color: #737373; color: #fff; }
+/* I really like unicode, but we use material icons for some buttons here.
+ *  → https://material.io/resources/icons/ */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(material-icons.woff2) format('woff2');
+}
 
-#add tr:hover, 
-#playlist tr:hover      { background-color: #737373; }
+body, button, input {
+    font-family: Verdana, sans-serif;
+    font-size: 3.5mm;
 
-.hilight      { background-color: #444; }
+}
 
-.shuffle .filelink { color:#ccc; }
+/***  Main Elements  ************************************************ */
 
-tt            { background-color: #444; color: #dfd; border: 1px dashed #666 }
+body {
+    background-color: var(--main-bg);
+    color: var(--main-text);
+}
 
-.dirlink      { color: #5FF; }
+button {
+    background-color: var(--button-bg);
+    color:var(--button-text);
+    border: 1px solid var(--button-border);
+    border-radius: 3px;
+    padding: 0.2em;
+    margin:0.2em;
+    cursor: pointer;
+}
 
-.desc         { color: #aaa; }
+button:focus {
+    outline:0;
+}
 
-.artist       { color: #dfd; }
+button:hover {
+    background-color: var(--hover-bg);
+}
 
-.track        { color: #dff; }
+input  {
+    border: none;
+    border-bottom: 1px solid var(--button-border);
+    background: var(--button-bg);
+    border-radius: 0;
+    color: var(--main-text);
+}
 
-.album        { color: #ddf; }
+/* Waiting-Overlay */
 
-.file         { color: #ddd; }
+#dimmer {
+    transition: opacity .2s ease;
+    background:rgba(0,0,0, .65);
+    font-weight:bold;
+    font-size:150%;
+    color: #FFFFFF;
+}
 
-.time         { color: #fff; }
-
-#progress     { border: 1px solid #aaa; }
-
-#progress_inn { background-color: #999; }
-
-#info { background-color:#555; border:2px solid #585858; border-radius: 3px; }
-
-#backcrumb          { background-color:#444; }
-#backcrumb .dirlink { border-left:1px dashed #666; }
-
-#searchbox, #streambox, #searchbutton, #streambutton, #streambookmarks { background-color: #444; border:1px solid black; color:#fff; }
+/* the 4 main screens. Only one is visible at a time. */
+#controls, #playlist, #add, #login {
+    margin: 2mm;
+    transition: height .2s;
+}
 
 
+/***  Tabs  ********************************************************* */
+
+#tabs {
+    width:100%;
+    background:var(--tabs-bg);
+}
+
+/* Fixed Tabs? */
+#tabs {
+    position:fixed;
+    height:2em;
+    top:0;
+    left:0;
+    z-index:1;
+}
+#controls, #playlist, #add, #login {
+    margin-top:2em;
+}
+/* Fixed Tabs! */
+
+#tabs button {
+    margin: 1px;
+    margin-bottom: 0;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 1px solid transparent;
+
+}
+#tabs button:first-child {
+    margin-left:-1px;
+}
+#tabs button:last-child {
+    margin-right:-1px;
+}
+
+#tabs button.active {
+    background: var(--main-bg);
+}
+
+#tabs button #plcount {
+    color: var(--dim-text);
+    font-size:75%;
+}
+
+
+/***  Controls  ***************************************************** */
+#cinfo {
+    padding-top: .5em;
+    grid-gap: .5em 0;
+}
+
+
+.desc          { color: var(--dim-text); }
+
+#artist        { color: #dfd; font-weight:bold; font-size:150%; }
+#track         { color: #dff; font-weight:bold; font-size:150%; }
+#album         { color: #ddf; font-weight:bold; font-size:150%; }
+#file, #nextup { color: var(--main-text); }
+
+#albumart {
+    max-width: min(16em, 33vw, 50vh);
+    max-height: min(16em, 33vw, 50vh);
+    margin:.5em;
+    padding:0;
+    overflow: auto;
+    cursor:pointer;
+}
+
+#albumart img {
+    width:97%;
+
+}
+
+#albumart table {
+    font-size:0.8em;
+    margin:0;
+}
+
+#albumart table th {
+    text-align: left;
+}
+
+#file {
+    max-height: 4em;
+    overflow:auto;
+    font-size:0.9em;
+}
+
+#file span:hover {
+    color: var(--folder-text);
+    cursor: pointer;
+}
+
+#nextup:hover { color: var(--remove-text); }
+#nextup.nohover:hover{ color: var(--main-text); }
+
+.time         { color: var(--main-text); }
+
+#progressline #curtime,
+#progressline #tottime {
+    font-size: .9em;
+    line-height: .8em;
+    padding: 0 .2em;
+}
+
+#progress     {
+    background-color: var(--pg-empty);
+    border: 1px solid var(--button-border);
+}
+
+#progress_inn {
+    background-color: var(--pg-full);
+}
+
+#cinfo #progress_hover { background: #00000070; padding: 0.4em; border-radius:0.5em; }
+
+
+#cbuttons button {
+    margin-top:0.9em;
+    font-size: 180%;
+    min-width: 3em;
+    min-height: 2em;
+    border-radius: 10%;
+    font-family: 'Material Icons';
+}
+
+/***  Playlist  ***************************************************** */
+
+#playlist div.box {
+    margin: 0;
+    padding: 0 0.7mm;
+    color: var(--button-text);
+    background: #00000000; /* solid transparent background */
+    transition: all .2s, background 0s;
+    min-height:6mm;
+    width: calc(100vw - 4.6mm);
+}
+
+#playlist div.box.move  { background: #00FF001e; }
+#playlist div.box.hover { background: var(--hover-bg); }
+
+#playlist button.boxdel {
+    font-weight:bold;
+    cursor: crosshair;
+    width: 6mm;
+    height: 6mm;
+    margin: 0;
+    margin-right: 0.5em;
+    padding: 0;
+    font-family: 'Material Icons';
+}
+
+#playlist button.boxdel:hover {
+    color: var(--remove-text);
+}
+
+#playlist div.boxinner {
+    max-width: calc(100vw - 20mm);
+}
+
+/* highlight current track in playlist or add-file */
+#playlist div.hilight {
+    color:var(--button-text);
+    background: var(--button-bg);
+}
+
+#playlist div.shuffle   { color:var(--main-text); }
+
+
+
+/***  Add File  ***************************************************** */
+
+#add #crumbtrail {
+    margin-bottom: 0.1em;
+}
+#add #crumbtrail button {
+    min-width:2.5em;
+    border: none;
+    border-radius: 0;
+    border-right: 2px dotted var(--dim-text);
+    margin: 0;
+    margin-top:1px;
+    padding: 0.1em 0.5em;
+    color: var(--folder-text);
+}
+
+#add #crumbtrail button:last-child {
+    border-right:none;
+}
+
+#add #search {
+    padding: 0.25em;
+    margin: 0;
+    margin-bottom: 0.6em;
+    width: calc(100% - 0.5em);
+}
+
+#add #itemlist .row {
+    min-height:6mm;
+    cursor: pointer;
+}
+
+#add #itemlist .row:hover {
+    background: var(--hover-bg);
+}
+
+#add #itemlist .row.inplaylist {
+    background: var(--button-bg);
+}
+
+#add #itemlist .row.inplaylist:hover {
+    background: var(--hover-bg);
+    color: var(--remove-text);
+}
+
+#add #itemlist .row button {
+    margin-top: 0;
+    margin-bottom: 0;
+    min-width: 6mm;
+    min-height:6mm;
+    font-family: 'Material Icons';
+}
+
+/* first colum */
+#add #itemlist .refresh { margin-right: 1em; }
+#add #itemlist .track   { margin-right: 1em; font-size:80%; }
+
+/* center column (artist - title) */
+/* #add #itemlist .line      { min-height:6mm; } */
+#add #itemlist .dir .line { color: var(--folder-text); }
+
+/* filename in search-results (also center column) */
+#add #itemlist .lfile   { font-size:75%; color:var(--dim-text); }
+
+/* last column */
+#add #itemlist .time    { padding-right:0.5em; }
+
+
+#errors {
+    padding: 1em;
+    background: #FF000030;
+    color: yellow;
+    display: none;
+}
+
+/***  Size corrections for filthy touchdevices ********************** */
+@media (pointer: coarse) {
+    input  {
+        font-size: 125%;
+    }
+
+    #tabs, button, input, #playlist div.box, #add #itemlist .row {
+        min-height: 10mm;
+    }
+
+    #tabs button {
+        font-size:110%;
+    }
+
+    #controls, #playlist, #add, #login {
+        margin-top:calc(10mm + 2px);
+    }
+
+    #playlist button.boxdel, #add #itemlist .row button {
+        min-width:8mm;
+        height:100%;
+    }
+
+    #add #crumbtrail button {
+        min-width: 15mm;
+    }
+
+    #add #itemlist .row:nth-child(odd) {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    #add #itemlist .row.inplaylist {
+        background: var(--button-bg);
+    }
+}

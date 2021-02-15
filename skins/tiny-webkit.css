@@ -1,0 +1,7 @@
+@import url("tiny.css");
+
+/* WebKit-Version with nice font */
+@font-face { font-family: 'Fix6x13web'; src: url('Fix6x13.ttf'); }
+body, button, input {
+    font-family: "Fix6x13web"; font-size: 13px; line-height:13px;
+}

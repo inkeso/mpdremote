@@ -9,20 +9,16 @@ header("Cache-Control: no-cache");
 header("Expires: -1");
 header("Content-Type: text/html; charset=utf-8");
 
-// some misc globals:
-$skin = getSkin();
-$mod  = maymod();
-
-// avoid magic_quotes
-if (get_magic_quotes_gpc()) {
-    function stripslashes_gpc(&$value)
-    {
-        $value = stripslashes($value);
+// allow login
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST["token"])) $_SESSION['token'] = $_POST["token"];
+    if (isset($_POST["usr"]) && isset($_POST["pw"]) && array_key_exists($_POST["usr"], ACCESS["users"])) {
+        $hash = ACCESS["users"][$_POST["usr"]];
+        if (password_verify($_POST["pw"], $hash)) {
+            // store user in Session
+            $_SESSION['usr'] = $_POST["usr"];
+        }
     }
-    array_walk_recursive($_GET, 'stripslashes_gpc');
-    array_walk_recursive($_POST, 'stripslashes_gpc');
-    array_walk_recursive($_COOKIE, 'stripslashes_gpc');
-    array_walk_recursive($_REQUEST, 'stripslashes_gpc');
 }
 
 ?>

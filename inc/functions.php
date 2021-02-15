@@ -1,5 +1,11 @@
 <?php
 
+// simple wrapper for "print json"
+function jout($arr) {
+    header("Content-Type: text/json; charset=utf-8");
+    print(json_encode($arr, JSON_PRETTY_PRINT));
+}
+
 // set skin and return its CSS
 function getSkin() {
     if (!isset($_SESSION["skin"])) $_SESSION["skin"] = "default";
@@ -16,9 +22,9 @@ function maymod() {
     2 - Lokal IP
     3 - Logged in user
     */
-    global $users;
-    global $allowIP;
-    
+    $users = ACCESS['users'];
+    $allowIP = ACCESS['allowIP'];
+
     if (isset($_SESSION['usr']) && array_key_exists($_SESSION['usr'], $users)) return 3;
     if (preg_match($allowIP, getenv('REMOTE_ADDR'))) return 2;
     if (array_key_exists('token', $_SESSION) && checkToken($_SESSION['token'])) return 1;
@@ -45,13 +51,13 @@ function checkToken($token) {
     if (!file_exists($tfile)) return FALSE;
     // read token-line
     $tline = file_get_contents($tfile);
-    
+
     if (strpos($tline, " for ")) {
         $duration = substr($tline, strpos($tline, " for ")+5);
         file_put_contents($tfile, "Token valid until ".(time()+$duration));
         return humanTime($duration);
     }
-    
+
     if (strpos($tline, " until ")) {
         $valid = substr($tline, strpos($tline, " until ")+7)+0;
         if ($valid > time()) {
@@ -66,35 +72,7 @@ function checkToken($token) {
     return FALSE; // invalid token-file
 }
 
-// Case insensitive Sort-function (currently unused --> natcasesort)
-function cmp ($a, $b) {
-    $tmp[0]=strtoupper($a);
-    $tmp[1]=strtoupper($b);
-    sort($tmp);
-    return (strcmp(strtoupper($tmp[1]) , strtoupper($b))) ? 1 : -1;
-}
-
-// make a nice "##. Artist - Title"-String, even out of untagged files
-// if $nonu is true, tracknumber won't be prepended
-function mkTitle($val, $forceFile=false) {
-    $title = $val['Artist']." - ".$val['Title'];
-    
-    // Show Tracknumber (by Tag)
-    if (isset($val['Track']) && strlen($val['Track']) > 0) {
-        $trn = explode("/", $val['Track']);
-        $title = $trn[0] ." ".$title;
-    }
-    
-    $file = $val['file'];
-    if ($forceFile || (strlen($val['Title']) < 1) || ($val['Title'] == $file))
-        // TODO: ersetze '-4' durch position des letzten punktes (erweiterung wegschneiden)
-        $title = substr($file, strrpos($file,"/")+1, -4);
-        // remove leading "00 "
-        $title = preg_replace('/^00 /','',$title);
-
-    return $title;
-}
-
+// need this in JS as well... actually, it's not used in any php-file...
 function humanTime($sec) {
     $h = intval($sec / 3600);
     $m = intval(($sec - $h*3600) / 60);
@@ -105,9 +83,18 @@ function humanTime($sec) {
         return sprintf ("%d:%02d", $m, $s);
 }
 
+function fromHumanTime($str) {
+    $smh = array_reverse(explode(":",$str));
+    $s = intval($smh[0]);
+    if (isset($smh[1])) $s += 60*intval($smh[1]);
+    if (isset($smh[2])) $s += 60*60*intval($smh[2]);
+    return $s;
+}
+
+// This fails gracefully, if no MPMagic is running
 function getMPMids() {
     $buffer = "";
-    $socket = @fsockopen("127.0.0.1",55443);
+    $socket = @fsockopen(MPMAGICONF['host'],MPMAGICONF['port']);
     if ($socket) {
         fwrite($socket, "historyids");
         while (!feof($socket)) { $buffer.= fgets($socket, 8192); }
@@ -116,46 +103,42 @@ function getMPMids() {
     return explode(",",trim($buffer));
 }
 
+// simple wrapper for class instanciation
+function connect($debug=false) {
+    set_error_handler(function($errno, $errstr, $errfile, $errline) {
+        die("<big><strong>MPD Connection failed</strong></big><br/>".$errstr."\n");
+    }, E_WARNING);
+    $mpd = new mpd(MPDCONFIG['host'],MPDCONFIG['port'],MPDCONFIG['password'], $debug);
+    restore_error_handler();
+    return $mpd;
+}
 
 // add a single file. or a dir full of files. Or an array with files.
 // mpd can recurse dirs itself. but the order is messed up. *sigh*
 // Doing own recursion and adding each file seperately is slower.
 // It may timeout, when adding large folders (increasing php-script-
-// timeout is an option...)
-//
-// Since every file is added separately, it may interferes with 
-// autoplaylist, so we use a wrapper-function to deactivate it 
-// temporally.
-//
-// actually this should not be needed, since tracks are always added 
-// before shuffle. but it doesn't hurt.
-
-function apl_service($on) {
-    $stream = @stream_socket_client("tcp://localhost:55443", $errno, $errstr);
-    $res = false;
-    if ($stream) {
-        fwrite($stream, "config apl service ".($on ? "True" : "False"));
-        stream_socket_shutdown($stream, STREAM_SHUT_WR); 
-        $res = stream_get_contents($stream) == "True";
-        fclose($stream);
-    }
-    return($res);
-}
+// timeout is an option...) So max. amout of files to add is limited.
 
 function addfiles($mpd, $fi) {
-    apl_service(false);
     // get length of playlist. Tracks are added at the end, so this will
     // be the first PLID to move.
     $start_id = count($mpd->playlist);
-    
+
     // really add them
-    addfiles_do($mpd, $fi);
-    
+
+    // Load soundcloud via plugin.
+    // https://github.com/MusicPlayerDaemon/MPD/blob/master/src/playlist/plugins/SoundCloudPlaylistPlugin.cxx
+    if (strpos($fi, "https://soundcloud.com") === 0) {
+        $mpd->PLLoad("soundcloud://url/".substr($fi, 8));
+    } else {
+        addfiles_do($mpd, $fi);
+    }
+
     // get length of playlist again. Since all the songs are added now,
     // the last index is the last PLID to move.
     $pl = $mpd->playlist;
     $stop_id = count($pl)-1;
-    
+
     // Now check for songs after current. If they are user-added, new
     // tracks are moved AFTER them.
     $shuffled = getMPMids();
@@ -167,31 +150,44 @@ function addfiles($mpd, $fi) {
             // TODO: try this via CommandQueue. It probably won't work.
             // (see above)
     }
-    apl_service(true);
     return $stop_id - $start_id + 1;
 }
 
+$filesadded = 0;
 function addfiles_do($mpd, $fi) {
-    // Add single file or dir.
+    global $filesadded;
+
+    // Add single file or whole dir
     if (is_string($fi)) {
         // what about streams?
-        if (substr($fi, 0, 7 ) === "http://") {
+        if (preg_match('#^http(s?)://.*#', $fi) === 1) {
+            $filesadded += 1;
+            if ($filesadded > MAXFILESADD) return;
             $mpd->PLAdd($fi);
         } else {
             $dir = $mpd->GetDir($fi); // yes, this works on files as well
             foreach($dir['directories'] as $k=>$v) addfiles_do($mpd, $v);
-            foreach($dir['files'] as $k=>$v) $mpd->PLAdd($v['file']);
+            foreach($dir['files'] as $k=>$v) {
+                $filesadded += 1;
+                if ($filesadded > MAXFILESADD) return;
+                $mpd->PLAdd($v['file']);
+            }
         }
     }
-    
+
     // Add array of files
     if (is_array($fi)) {
         // $mpd->PLAddBulk($fi);                   // Q: why not?
-        foreach($fi as $k=>$v) $mpd->PLAdd($v);
+        foreach($fi as $k=>$v) {
+            $filesadded += 1;
+            if ($filesadded > MAXFILESADD) return;
+            $mpd->PLAdd($v);
+        }
     }
     // A: bulkadd is queued, so moving afterwards doesn't work, since the
-    // playlist isn't modified yet (I suppose). I didn't find a way to 
+    // playlist isn't modified yet (I suppose). I didn't find a way to
     // wait for the queue to finish. Most likely something else is going on.
 }
+
 
 ?>

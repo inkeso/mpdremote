@@ -1,0 +1,292 @@
+/* based on default-theme, but everything is tiny. */
+
+:root {
+    --tabs-bg: #000;
+    --main-bg: #222;
+    --main-text: #ddd;
+    --dim-text: #888;
+    --folder-text: #0DF;
+    --remove-text: #F44;
+
+    --button-bg: #111;
+    --button-text: #ddd;
+    --button-border: #333;
+
+    --hover-bg: #009;
+    --pg-empty: #00000060;
+    --pg-full: #0000FF60;
+
+}
+/*** Main Colors and Elements  ******************************************* */
+
+/* Bitmap-Fonts and Browser are not meant to be for each other.
+ → In Firefox, only the locally installed Fix6x13 works.
+    body, button, input {
+        font-family: "Fix6x13"; font-size: 13px; line-height:13px;
+    }
+
+ → In Webkit, the same font works only, when it's loaded here:
+    @font-face { font-family: 'Fix6x13web'; src: url('Fix6x13.ttf'); }
+    body, button, input {
+        font-family: "Fix6x13web"; font-size: 13px; line-height:13px;
+    }
+
+ → In Chromium neither works, we have to use a vector-font there.
+    body, button, input {
+        font-family: monospace; font-size: 11px; line-height:13px;
+    }
+
+   So here we are. 2020 and still need a browser-selector or some other kind of
+   logic or must use a vector-font.
+   And I still haven't found the font i'm looking for.
+*/
+
+body, button, input {
+    font-family: "DejaVu Sans", "Verdana", sans;
+    font-size: 11px;
+    line-height:13px;
+}
+
+
+body {
+    background-color: var(--main-bg);
+    color: var(--main-text);
+}
+
+button {
+    background-color: var(--button-bg);
+    color:var(--button-text);
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+button:focus, input:focus { outline:0; }
+
+button:hover  {
+    background-color: var(--hover-bg);
+}
+
+input  {
+    border: none;
+    background: var(--button-bg);
+    color: var(--main-text);
+}
+
+/*** Waiting-Overlay ***/
+#dimmer {
+    background:rgba(0,0,0, .75);
+    font-weight:bold;
+    color: #FFFFFF;
+    transition: opacity .2s ease;
+}
+
+/*** the 4 main screens. Only one is visible at a time. ***/
+#controls, #playlist, #add, #login {
+    margin: 0 6px;
+    margin-top:13px;
+    transition: height .2s;
+}
+
+#controls {
+    margin-top:26px;
+}
+
+/* ***  Tabs  ******************************************* */
+#tabs {
+    width:calc(100% - 102px);
+    margin-left:102px;
+    background:var(--tabs-bg);
+}
+
+/* Fixed Tabs? */
+#tabs {
+    position:fixed;
+    height:13px;
+    top:0;
+    left:0;
+    z-index:1;
+}
+#tabs button {
+    height: 13px;
+}
+/* Fixed Tabs! */
+
+#tabs button {
+    margin: 0;
+    border: none;
+}
+
+#tabs button.active {
+    background: var(--main-bg);
+}
+
+#tabs button #plcount {
+    color: var(--dim-text);
+}
+
+/***  Controls  ******************************************* */
+#cinfo {
+    align-items:start;
+    grid-gap: .75em 0;
+}
+
+
+#albumart {
+    /* display: none; */
+    max-width: 8em;
+    max-height: 8em;
+}
+#albumart img {
+    width:100%;
+}
+
+
+.desc          { color: var(--dim-text); }
+
+#artist        { color: #5f5; }
+#track         { color: #5ff; }
+#album         { color: #59f; }
+#file, #nextup { color: var(--main-text); }
+
+#file {
+    max-height: 4em;
+    overflow:unset;
+}
+
+#file span:hover {
+    color: var(--folder-text);
+    cursor: pointer;
+}
+
+#nextup:hover { color: var(--remove-text); }
+#nextup.nohover:hover{ color: var(--main-text); }
+
+.time         { color: var(--main-text); }
+
+#progress     {
+    background-color: var(--pg-empty);
+    border: none;
+}
+#progress_inn { background-color:  var(--pg-full) }
+
+#progressline #curtime,
+#progressline #tottime {
+    font-size: 1em;
+    line-height: .9em;
+    color: white;
+}
+
+#cinfo #progress_hover { background: #000000C0; padding: 0.4em; }
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(material-icons.woff2) format('woff2');
+}
+
+#cbuttons button {
+    min-width:  48px;
+    min-height: 3em;
+    margin-top: 1em;
+    font-family: 'Material Icons';
+    font-size:14px;
+}
+
+/* ***  Playlist  *************************************************** */
+
+#playlist div.box {
+    margin: 0;
+    padding: 0;
+    color: var(--button-text);
+    background: #00000000; /* solid transparent background */
+    transition: all .2s, background 0s;
+    width: calc(100vw - 12px);
+}
+
+#playlist div.box.move  { background: #00FF001e; }
+#playlist div.box.hover { background: var(--hover-bg); }
+
+#playlist button.boxdel {
+    font-weight:bold;
+    cursor: crosshair;
+    width: 18px;
+    margin: 0;
+    margin-right: 6px;
+    padding: 0;
+    font-family: 'Material Icons';
+}
+
+#playlist button.boxdel:hover {
+    color: var(--remove-text);
+}
+
+#playlist div.boxinner {
+    max-width: calc(100vw - 36px);
+}
+
+/* highlight current track in playlist or add-file */
+#playlist div.hilight {
+    color:var(--button-text);
+    background: var(--button-bg);
+}
+
+#playlist div.shuffle   { color:var(--main-text); }
+
+
+/* ***  Add File  *************************************************** */
+#add #crumbtrail button {
+    min-width:30px;
+    border-right: 1px dotted var(--dim-text);
+    margin: 0;
+    padding: 0 6px;
+    color: var(--folder-text);
+}
+
+#add #crumbtrail button:last-child {
+    border-right:none;
+}
+
+#add #search {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#add #itemlist .row {
+    cursor: pointer;
+}
+
+#add #itemlist .row:hover {
+    background: var(--hover-bg);
+}
+#add #itemlist .row.inplaylist:hover {
+    background: var(--hover-bg);
+    color: var(--remove-text);
+}
+
+#add #itemlist .row button {
+    padding: 0 6px;
+    width: max-content;
+    font-family: 'Material Icons';
+}
+
+/* first colum */
+#add #itemlist .refresh { margin-right: 6px; }
+#add #itemlist .track   { margin-right: 6px; }
+
+/* center column (artist - title) */
+#add #itemlist .line    { min-height:13px; }
+#add #itemlist .dir .line { color: var(--folder-text); }
+
+/* filename in search-results (also center column) */
+#add #itemlist .lfile   { color:var(--dim-text); }
+
+/* last column */
+#add #itemlist .time    { padding-right:6px; }
+
+#add .inplaylist {
+    background: var(--button-bg);
+}
+
