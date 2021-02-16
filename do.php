@@ -30,7 +30,7 @@ function findFile($file, $playlist) {
     return $pid;
 }
 
-switch (array_keys($_GET)[0]) {
+switch (count($_GET) ? array_keys($_GET)[0] : "unknown") {
     case 'prev':
         $mpclient->Previous();
         break;

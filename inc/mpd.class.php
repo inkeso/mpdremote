@@ -253,7 +253,8 @@ class mpd {
 
             fputs($this->mpd_sock,"$cmdStr\n");
             while(!feof($this->mpd_sock)) {
-                $response = fgets($this->mpd_sock,1024);
+                // binary responses are a bit more than 8KiB.
+                $response = fgets($this->mpd_sock, 8448);
                 //addLog($response);
 
                 // An OK signals the end of transmission -- we'll ignore it
@@ -856,30 +857,16 @@ class mpd {
     // TODO: Some covers don't load correctly! Why?
     function GetCover( $filepath = NULL ) {
         addLog("mpd->GetCover()");
-        if ( is_null($filepath) ) return "";
+        if (is_null($filepath)) return "";
         $size = 0;
         $data = "";
         while ($res = $this->SendCommand('albumart', $filepath, strlen($data))) {
-            $go = false;
-            $chunk = "";
-            $readbytes = 0;
-            foreach(explode("\n", $res) as $l) {
-                if (!$go) {
-                    if ($size === 0 && strpos($l, "size: ") !== false) {
-                        $size = intval(explode(": ",$l)[1]);
-                    }
-                    if (strpos($l, "binary: ") !== false) {
-                        $readbytes = intval(explode(": ",$l)[1]);
-                        $go = true;
-                    }
-                } else {
-                    $chunk .= "\n".$l;
-                }
-            }
-            $data .= substr($chunk, 1, $readbytes);
+            $rx = explode("\n", $res, 3);
+            if ($size === 0) $size = intval(explode(": ",$rx[0])[1]);
+            $readbytes = intval(explode(": ",$rx[1])[1]);
+            $data .= substr($rx[2], 0, $readbytes);
             if (strlen($data) >= $size) break;
         }
-        addLog("mpd->GetCover()");
         return $data;
     }
 

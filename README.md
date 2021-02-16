@@ -47,7 +47,9 @@ Dabei ist die Anwesenheit der Elemente nicht garantiert.
     {
      'trackinfo': <TRACKINFO>,
      'time': 123,                       # Spieldauer in Sekunden
-     'state': 'play'                    # 'play', 'pause' oder 'stop'
+     'state': 'play',                   # 'play', 'pause' oder 'stop'
+     'playlistcount': 123,              # Anzahl der Tracks in der Playlist
+     'next': <TRACKINFO>                # Nächster Titel in Playlist
     }
 ```
 
@@ -102,6 +104,7 @@ oder eine soundcloud-seite aus der die dort gelisteten tracks extrahiert werden.
 Beachte auch die Hinweise zum soundcloud-API-key in der `config.php`.
 
 #### get.php?podcastnames
+
 Gibt eine Liste der podcast-bookmarks zurück (nur die Namen).
 
 
@@ -112,6 +115,12 @@ ist es im gleichen Format wie ?dir=... aber `dirs` ist immer leer.
 Denn nach Verzeichnissen suchen wir nicht. Noch nicht...
 
 
+#### get.php?albumart
+
+Gibt das Coverbild des aktuellen Titels zurück oder einen Platzhalter, wenn kein
+Coverbild gefunden wurde. (cover.jpg, cover.png im Verzeichnis des aktuellen Tracks)
+mpd unterstützt auch bmp und tiff, Browser nicht. Übertragen wird es trotzdem.
+Daher lieber keine cover.bmp oder cover.tiff haben.
 
 ### do.php führt Aktionen aus.
 
@@ -140,6 +149,10 @@ außerdem kann man so direkt streambare urls hinzufügen sowie soundcloud-links
 #### do.php?pause, do.php?next, do.php?prev
 
 Pause toggeln, Nächster Track, Vorheriger Track.
+
+#### do.php?podcastnames
+
+gibt ein Array der podcast-namen zurück
 
 #### do.php?skip=<to>
 
@@ -196,24 +209,24 @@ dorthinzugelangen (im Tab »Add Song«)
 
 Die Playlist ist per drag'n'drop umsortierbar und updated sich dynamisch von selbst.
 
-Bei »Add Song« ist das Suchfeld ist immer eingeblendet und agiert Ordnerweise. Im
+Bei »Add Song« ist das Suchfeld immer eingeblendet und agiert Ordnerweise. Im
 Ordner "streams" kann man statt zu Suchen eine URL pasten, die dann direkt der
 Playlist hinzugefügt wird. Unterstützt werden dort Direktlinks zu medien-
 dateien/-streams & soundcloud (dort auch Links zu Playlisten, Usern, etc. also
 mehr als eine Datei auf einmal). Keine Ahnung ob links zu .m3u oder .pls auch
 funktionieren würden. (TODO: rausfinden)
 
-#### static.php (_TODO_)
+#### static.php
 
-Das JS-freie billo-frontend. Wenn der browser kein JS kann, wird von der
-index.php automatisch hierher weitergeleitet.
+Das JS-freie old-school-HTML-frontend. CSS ist inline, also keine skins.
+Funktioniert auch in Browsern wie netsurf, dillo, w3m, (e)links etc.
+Ist nicht ganz so komfortabel, dafür sehr resource-schonend.
 
 #### telnet.php (_TODO_)
 
 Für wenns mal ganz ohne Browser gehen muss würd ich hier denn noch ein
 terminal-frontend bauen. Vielleicht. So richtig mit ANSI und allem
-pipapo.
-
+pipapo. Ich weiß aber noch nicht, wie/ob damit sinnvoll interagiert werden kann.
 
 
 

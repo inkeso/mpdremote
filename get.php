@@ -20,7 +20,7 @@ function plfile($val) {
 
 $mpclient = connect();
 
-switch (array_keys($_GET)[0]) {
+switch (count($_GET) ? array_keys($_GET)[0] : "current") {
     case 'current':
         $play = ($mpclient->state);
         if ($play == MPD_STATE_PLAYING || $play == MPD_STATE_PAUSED) {
@@ -141,10 +141,16 @@ switch (array_keys($_GET)[0]) {
             $fina = $mpclient->playlist[$mpclient->current_track_id]['file'];
             $data = $mpclient->GetCover($fina);
         }
-        header('Content-type: image');
         if ($data) {
+            // Well yeah, there may be BMP or TIFF, but we don't take care of them (yet?)
+            if (substr($data,1,3) == "PNG") {
+                header('Content-type: image/png');
+            } else {
+                header('Content-type: image/jpeg');
+            }
             echo $data;
         } else {
+            header('Content-type: image/png');
             echo readfile("skins/albumicon.png");
         }
         break;
