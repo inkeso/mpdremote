@@ -305,6 +305,7 @@ input  {
     min-width: 6mm;
     min-height:6mm;
     font-family: 'Material Icons';
+    margin-left: auto;
 }
 
 /* first colum */

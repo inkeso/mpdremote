@@ -269,6 +269,7 @@ input  {
 #add #itemlist .row button {
     padding: 0 6px;
     width: max-content;
+    margin-left: auto;
     font-family: 'Material Icons';
 }
 
