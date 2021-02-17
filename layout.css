@@ -19,8 +19,8 @@ body {
     top:0;
     padding-top:40%;
     text-align:center;
-    z-index:-2;
-    opacity:0;
+    z-index:2;
+    opacity:1;
 }
 
 #tabs {

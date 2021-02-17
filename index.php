@@ -103,12 +103,13 @@ document.addEventListener('DOMContentLoaded', event => {
     <?php } ?>
     showcontrols();
     playlist.initialize();
+    undimm();
 });
 
 --></script>
 </head>
 <body>
-    <div id="dimmer">Moment...</div>
+    <div id="dimmer">Moment... <noscript><p style="color:red">No JavaScript support! Use <a style="color:orange" href="static.php">Static interface</a> instead.</p></noscript></div>
     <div id="tabs">
         <button id="b_ctr" onclick="showcontrols();">Controls</button>
         <button id="b_pls" onclick="showplaylist();">Playlist <span id="plcount"></span></button>
@@ -162,6 +163,7 @@ document.addEventListener('DOMContentLoaded', event => {
         </form>
     </div>
 
-    <div id="errors"></div>
+    <div id="errors">
+    </div>
 </body>
 </html>
