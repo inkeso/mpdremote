@@ -90,6 +90,14 @@ if ($mod) {
             font-size: 200%;
             font-family: mono;
         }
+
+        a.file {
+            color: #FFDB00;
+        }
+        a.shuffle {
+            color: #aaa;
+        }
+
         th a { display: block; }
         img {
             max-width: 300px;
@@ -159,12 +167,12 @@ switch($tab) {
             if ($k < count($playlist)-1) $dn = '<a href="?mv='.$v->Id.','.$playlist[$k+1]->Id.$stamp.'">&nbsp;↓&nbsp;</a>';
             $up = "&nbsp";
             if ($k > 0) $up = '<a href="?mv='.$v->Id.','.$playlist[$k-1]->Id.$stamp.'">&nbsp;↑&nbsp;</a>';
-
+            $class = $v->fromshuffle ? "shuffle" : "file";
             echo '<tr class="'.($v->currently ? "hilight" : "").'">';
             echo '<th>'.$dn.'</th>';
             echo '<th>'.$up.'</th>';
             echo '<th><a href="?rm='.$v->Id.$stamp.'">&nbsp;x&nbsp;</a></th>';
-            echo '<td width="100%"><a href="?go='.$v->Id.$stamp.'">'.htmlentities($v->Artist).' - '.htmlentities($v->Title).'</a></td>';
+            echo '<td width="100%"><a class="'.$class.'" href="?go='.$v->Id.$stamp.'">'.htmlentities($v->Artist).' - '.htmlentities($v->Title).'</a></td>';
             echo '<td>'.humanTime($v->Time).'</td>';
             echo "</tr>\n";
         }
@@ -228,7 +236,7 @@ switch($tab) {
                     echo $f->Track ? $f->Track : "&nbsp;";
                     $link = '&add='.urlencode($f->file);
                 }
-                echo '</td><td width="100%"><a href="?t=a'.$link.$app.'">';
+                echo '</td><td width="100%"><a class="file" href="?t=a'.$link.$app.'">';
                 if (!$same) echo htmlentities($f->Artist)." - ";
                 if ($f->Title) {
                     echo htmlentities($f->Title);
