@@ -43,7 +43,7 @@ td.progress {
     width: 100%;
 }
 
-#cbuttons {
+#cbuttons, #playerbox, #guestticket {
     text-align:center;
 }
 
@@ -74,9 +74,6 @@ button {
 #cinfo #nextup:hover { text-decoration: line-through; }
 #cinfo #nextup.nohover      { cursor: default; }
 #cinfo #nextup.nohover:hover{ text-decoration: none; }
-#cinfo #cbuttons,
-#cinfo #guestticket  { grid-column: 1 / span 3; }
-
 
 @media  (max-height: 430px) {
     #cinfo #file        { grid-column: 2; }

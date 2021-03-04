@@ -131,7 +131,9 @@ function updatecurrent() {
         if (currentinfo.time != answer.time) {
             $("#curtime").innerHTML = answer.time.humanTime();
             if ("Time" in ti) {
-                $("#progress_inn").style.width = (answer.time / ti.Time * 100) + "%";
+                let perc = (answer.time / ti.Time * 100);
+                if (!isFinite(perc)) perc=1;
+                $("#progress_inn").style.width = perc + "%";
             } else {
                 $("#progress_inn").style.width = "0%"
             }

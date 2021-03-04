@@ -216,6 +216,11 @@ dateien/-streams & soundcloud (dort auch Links zu Playlisten, Usern, etc. also
 mehr als eine Datei auf einmal). Keine Ahnung ob links zu .m3u oder .pls auch
 funktionieren würden. (TODO: rausfinden)
 
+Eine Streamabspielmöglichkeit kann per parameter `...&player` eingebunden werden.
+Damit das klappt, muss der Pfad in der `player.html` angepasst werden.
+Wenn man dann noch `#play` anhängt, wird der stream direkt beim laden gestartet.
+(Sofern der Browser das zulässt)
+
 #### static.php
 
 Das JS-freie old-school-HTML-frontend. CSS ist inline, also keine skins.

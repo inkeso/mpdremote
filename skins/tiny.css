@@ -95,8 +95,7 @@ input  {
 
 /* ***  Tabs  ******************************************* */
 #tabs {
-    width:calc(100% - 102px);
-    margin-left:102px;
+    width:100%;
     background:var(--tabs-bg);
 }
 
@@ -180,10 +179,10 @@ input  {
 
 #cinfo #progress_hover { background: #000000C0; padding: 0.4em; }
 @font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url(material-icons.woff2) format('woff2');
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(material-icons.woff2) format('woff2');
 }
 
 #cbuttons button {
@@ -192,7 +191,67 @@ input  {
     margin-top: 1em;
     font-family: 'Material Icons';
     font-size:14px;
+    display: inline-block;
 }
+
+#playerbox {
+    margin-top: .25em;
+}
+
+#playerbox button {
+    min-width:  48px;
+    min-height: 1em;
+    font-family: 'Material Icons';
+    font-size:14px;
+    display: inline-block;
+}
+
+/* Volume-Slider */
+input[type=range] {
+    -webkit-appearance: none;
+    width: 99px;
+    border: none;
+    height: 14px;
+    display:inline-block;
+    background-color: var(--button-bg);
+    margin: 0;
+}
+input[type=range]:hover {
+    background-color: var(--hover-bg);
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height: 1px;
+    cursor: pointer;
+    background: var(--main-bg);
+}
+input[type=range]::-moz-range-track {
+    height: 1px;
+    cursor: pointer;
+    background: var(--main-bg);
+    border:none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    border: 1px solid var(--button-border);
+    height: 9px;
+    width: 9px;
+    border-radius: 0;
+    background: var(--button-text);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -4px;
+}
+
+input[type=range]::-moz-range-thumb {
+    border: 1px solid var(--button-border);
+    height: 7px;
+    width: 7px;
+    border-radius: 0;
+    background: var(--button-text);
+    cursor: pointer;
+}
+/* Volume-Slider end */
 
 /* ***  Playlist  *************************************************** */
 

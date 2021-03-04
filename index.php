@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', event => {
             <button id="playbutton" onclick="action('pause');">pause</button>
             <button onclick="action('next');">fast_forward</button>
         </div>
-
+        <?php if (isset($_GET["player"])) readfile("player.html"); ?>
         <div id="guestticket">Fahrschein noch gültig: </div>
     </div>
 
