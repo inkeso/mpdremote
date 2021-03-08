@@ -205,6 +205,10 @@ input  {
     font-size:14px;
     display: inline-block;
 }
+#playerbox button div { 
+    margin: 5px 0; 
+    height: 3px; 
+}
 
 /* Volume-Slider */
 input[type=range] {

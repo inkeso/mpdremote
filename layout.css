@@ -95,6 +95,7 @@ button {
 #cinfo #progress_hover { position: absolute; z-index:2; display: none}
 #cinfo #progress:hover #progress_hover { display: block; }
 
+#playerbox #plp div { display: inline-block; }
 
 /* ***  PLAYLIST  *************************************************** */
 

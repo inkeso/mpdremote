@@ -5,3 +5,5 @@
 body, button, input {
     font-family: "Fix6x13web"; font-size: 13px; line-height:13px;
 }
+#playerbox button { height: 13px; min-height: 13px; }
+input[type=range] { height: 13px; width: 102px; }

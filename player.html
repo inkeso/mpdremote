@@ -14,7 +14,7 @@
     }
     function delayedplay() {
         if (remain >= 0) {
-            $('#plp').innerHTML = '<div style="background:var(--button-text); height:20%; width:'+(100-remain/buffer*100)+'%">&nbsp;</div>';
+            $('#plp').innerHTML = '<div style="background:var(--button-text); width:'+(100-remain/buffer*100)+'%"></div>';
             remain -= delay
             loading = window.setTimeout(delayedplay, delay);
             return
