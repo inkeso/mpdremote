@@ -67,6 +67,17 @@ function showcontrols() {
 function showplaylist() {
     show("playlist");
     updateplaylist();
+    // scroll window so current song is in the middle (if needed)
+    var observer = new MutationObserver(function(mutations) {
+       if (document.contains($(".hilight")[0])) {
+            var y = $(".hilight")[0].initY;
+            if ($("#playlist").clientHeight > innerHeight) scrollTo(0, y - innerHeight/2);
+            observer.disconnect();
+        }
+    });
+    observer.observe($("#playlist"), {
+        attributes: false, childList: true, characterData: false, subtree: true
+    });
     ctupdate = window.setInterval(updateplaylist, 5000);
 }
 
@@ -88,6 +99,8 @@ function showadd() {
         show("login");
         $('#login').style.display="block";
     <?php } ?>
+    // scroll to top
+    scrollTo(0, 0);
 }
 
 // autostart after load

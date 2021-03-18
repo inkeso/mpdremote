@@ -134,15 +134,11 @@ let adder = {
 
     // go to specified dir
     goto: function(dir=this.currentpath) {
+        if (this.currentpath != dir) scrollTo(0,0);
         this.currentpath = dir;
         this.createcrumbtrail();
         this.items();
-        scrollTo(0,0);
     },
-
-    addfile: function(){},
-    adddir: function(){},
-    addstream: function(){},
 
     dosearch: function() {
         let term = $("#search").value;
