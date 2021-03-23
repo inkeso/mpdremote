@@ -94,7 +94,7 @@ function allinfo(ti) {
         for (let k in ti) {
             if (not.indexOf(k) >= 0) continue;
             if (ti[k] == null || ti[k] == "") continue;
-            s += "<tr><th>"+k.replaceAll("_", " ").toLowerCase().escapeHtml()+"</th><td>"+ti[k].escapeHtml()+"</td></tr>\n";
+            s += "<tr><th>"+k.replaceAll("_", " ").escapeHtml()+"</th><td>"+ti[k].escapeHtml()+"</td></tr>\n";
         }
         return s+"</table>";
     } else {

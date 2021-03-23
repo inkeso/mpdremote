@@ -163,7 +163,7 @@ input  {
 }
 
 #albumart table th {
-    text-align: left;
+    text-align: right;
 }
 
 #file {
@@ -226,8 +226,8 @@ input  {
     margin: 0;
     border-radius: 4px;
 }
-#playerbox button div { 
-    margin: 0.45em 0; 
+#playerbox button div {
+    margin: 0.45em 0;
     height: 0.1em;
 }
 

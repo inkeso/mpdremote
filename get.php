@@ -151,7 +151,33 @@ switch (count($_GET) ? array_keys($_GET)[0] : "current") {
             echo $data;
         } else {
             header('Content-type: image/png');
-            echo readfile("skins/albumicon.png");
+            if(class_exists("Imagick")) {
+                // lieber ein img mit den restlichen meta-infos generieren
+                $arr = $mpclient->playlist[$mpclient->current_track_id];
+                $txt = "";
+                $not = array('file', 'duration', 'Time', 'Artist', 'Title', 'Album', 'fromshuffle', 'Id', 'Pos');
+                $gmax = 0;
+                foreach($arr as $k => $v) {
+                    if (strlen($k) > $gmax) $gmax = strlen($k);
+                }
+
+                foreach($arr as $k => $v) {
+                    if (!in_array($k, $not)) $txt .= sprintf("%".$gmax."s : %s\n", $k, $v);
+                }
+                $img = new Imagick();
+                $img->newImage(256, 256, new ImagickPixel("none"));
+                //$img->newImage(256, 256, new ImagickPixel("#".crc32($arr["Album"])));     // oder farbe oder muster nach albumname?
+                $drw = new ImagickDraw();
+                $drw->setFillColor('#FFFFFF30');
+                $drw->setFont('skins/Fix6x13.ttf');
+                $drw->setFontSize(13);
+                $img->annotateImage($drw, 1, 10, 0, $txt);
+                $img->setImageFormat('png');
+            } else {
+                $img = readfile("skins/albumicon.png");
+            }
+
+            echo $img;
         }
         break;
 }
