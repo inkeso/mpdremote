@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', event => {
         <?php if (isset($_GET["player"])) readfile("player.html"); ?>
         <div id="guestticket">Fahrschein noch gültig: </div>
     </div>
+    <?php if (isset($_GET["player"]) && $_GET["player"] == "visu") readfile("visu.html"); ?>
 
     <div id="playlist" button="b_pls"></div>
 

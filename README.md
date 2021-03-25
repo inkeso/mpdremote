@@ -194,16 +194,8 @@ JS-SPA, die dann auch für Tatschgeräte gut funktionieren soll.
 
 ### index.php - das Hauptfrontend
 
-#### index.php?skin=<CSS-file>
-
-CSS aus dem skins-ordner laden. Bsp: `index.php?skin=foo` läd die Datei
-skins/foo.css. Wenn die nicht gefunden wird oder der parameter leer ist,
-wird die `skins/default.css` geladen.
-Wie gehabt ist das eigentliche Layout abgetrennt in der `layout.css` und
-wird immer vorher geladen. Dort sind KEINE Farb- oder Größenangaben!
-
-Bei »Controls« wird nun auch das nächste Lied angezeigt und man kann es dort
-auch löschen.
+Bei »Controls« wird neben dem aktuellen nun auch das nächste Lied angezeigt
+und man kann es dort auch löschen.
 Außerdem kann man im Dateipfad die übergeordneten Ordner anklicken um direkt
 dorthinzugelangen (im Tab »Add Song«)
 
@@ -216,18 +208,34 @@ dateien/-streams & soundcloud (dort auch Links zu Playlisten, Usern, etc. also
 mehr als eine Datei auf einmal). Keine Ahnung ob links zu .m3u oder .pls auch
 funktionieren würden. (TODO: rausfinden)
 
+#### Parameter
+
+##### index.php?skin=<CSS-file>
+
+CSS aus dem skins-ordner laden. Bsp: `index.php?skin=foo` läd die Datei
+skins/foo.css. Wenn die nicht gefunden wird oder der parameter leer ist,
+wird die `skins/default.css` geladen.
+Wie gehabt ist das eigentliche Layout abgetrennt in der `layout.css` und
+wird immer vorher geladen. Dort sind KEINE Farb- oder Größenangaben!
+
+#### index.php?player[=visu][#play]
+
 Eine Streamabspielmöglichkeit kann per parameter `...&player` eingebunden werden.
 Damit das klappt, muss der Pfad in der `player.html` angepasst werden.
-Wenn man dann noch `#play` anhängt, wird der stream direkt beim laden gestartet.
-(Sofern der Browser das zulässt)
 
-#### static.php
+Setzt man den Parameter `...&player=visu`, wird im Hintergrund der Seite eine
+Visualisierung dargestellt, sofern vom Browser unterstütz. (Siehe `visu.html`)
+
+Wenn man dann noch `#play` anhängt, wird der stream direkt beim laden gestartet.
+(Sofern der Browser das zulässt, meistens funktioniert das nicht)
+
+### static.php
 
 Das JS-freie old-school-HTML-frontend. CSS ist inline, also keine skins.
 Funktioniert auch in Browsern wie netsurf, dillo, w3m, (e)links etc.
 Ist nicht ganz so komfortabel, dafür sehr resource-schonend.
 
-#### telnet.php (_TODO_)
+### telnet.php (_TODO_)
 
 Für wenns mal ganz ohne Browser gehen muss würd ich hier denn noch ein
 terminal-frontend bauen. Vielleicht. So richtig mit ANSI und allem

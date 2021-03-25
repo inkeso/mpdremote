@@ -1,0 +1,49 @@
+<script>
+    visu = {
+        start: function() {
+            var actx = new AudioContext();
+            var anal = actx.createAnalyser();
+            actx.createMediaElementSource(player).connect(anal);
+            anal.connect(actx.destination);
+            anal.fftSize = 512;
+            var bands = Math.round(anal.frequencyBinCount * 5/7);
+            var canvas = document.getElementById('visu');
+            canvas.width  = canvas.getClientRects()[0].width;
+            canvas.height = canvas.getClientRects()[0].height;
+            var cw = canvas.width;
+            var ch = canvas.height;
+            var gap = 1;
+            var mWidth = (cw - bands * gap) / bands;
+            var ctx = canvas.getContext('2d');
+
+            function renderFrame() {
+                var array = new Uint8Array(anal.frequencyBinCount);
+                anal.getByteFrequencyData(array);
+                ctx.clearRect(0, 0, cw, ch);
+                for (var i = 0; i < bands; i++) {
+                    var barh = ch/255 * array[i];
+                    var gradient = ctx.createLinearGradient(0, ch-barh, 0, ch);
+                    gradient.addColorStop(0,   '#0BBFF430');
+                    gradient.addColorStop(0.5, '#003FD115');
+                    gradient.addColorStop(1,   '#00000007');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(i*(mWidth+gap), ch - barh, mWidth, ch);
+                }
+                if (player) {
+                    requestAnimationFrame(renderFrame);
+                } else {
+                    requestAnimationFrame(visu.stop);
+                }
+            }
+            renderFrame();
+        },
+
+        stop: function() {
+            var canvas = document.getElementById('visu');
+            var cw = canvas.width;
+            var ch = canvas.height;
+            canvas.getContext('2d').clearRect(0, 0, cw, ch);
+        }
+    };
+</script>
+<canvas id="visu" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:-2;"></canvas>

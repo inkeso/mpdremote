@@ -146,6 +146,8 @@ input  {
 #albumart {
     max-width: min(16em, 33vw, 50vh);
     max-height: min(16em, 33vw, 50vh);
+    width: min(16em, 33vw, 50vh);
+    height: min(16em, 33vw, 50vh);
     margin:.5em;
     padding:0;
     overflow: auto;

@@ -3,14 +3,14 @@
     var buffer = 4000; // milliseconds to prebuffer to avoid stream stutter.
     var delay = 100;  // pause between calls. doesn't really matter.
 
-    var playervolume = 0.9;
     var player = null;
     var loading = null;
     var remain = buffer;
 
+    var visu = null;
+
     function setvol(fu) {
-        playervolume = fu;
-        if (player) player.volume = playervolume;
+        if (player) player.volume = fu;
     }
     function delayedplay() {
         if (remain >= 0) {
@@ -33,7 +33,7 @@
     function makeplayer() {
         if (loading) return;
         player = new Audio(stream + "?" + Date.now());
-        player.volume = playervolume;
+        player.volume = $("#slide").value;
         remain = buffer;
         loading = window.setTimeout(delayedplay, delay);
     }
@@ -50,11 +50,12 @@
     function toggl() {
         if (!player) {
             makeplayer();
+            if (visu && window.AudioContext) visu.start()
         } else {
             removeplayer();
         }
     }
-    // TODO: wenn "#play" dann autoplay (das kann der browser aber verhindern)
+    // wenn "#play" dann autoplay (das kann der browser aber verhindern)
     if (location.hash == "#play") {
         document.addEventListener('DOMContentLoaded', makeplayer);
     }
