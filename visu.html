@@ -1,34 +1,27 @@
 <script>
+
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+
     visu = {
+        fx: 0,
+
         start: function() {
+            // Audio Stuff
             var actx = new AudioContext();
             var anal = actx.createAnalyser();
             actx.createMediaElementSource(player).connect(anal);
             anal.connect(actx.destination);
             anal.fftSize = 512;
-            var bands = Math.round(anal.frequencyBinCount * 5/7);
+            // Video Stuff
             var canvas = document.getElementById('visu');
             canvas.width  = canvas.getClientRects()[0].width;
             canvas.height = canvas.getClientRects()[0].height;
-            var cw = canvas.width;
-            var ch = canvas.height;
-            var gap = 1;
-            var mWidth = (cw - bands * gap) / bands;
-            var ctx = canvas.getContext('2d');
+            visu.cw = canvas.width;
+            visu.ch = canvas.height;
+            visu.ctx = canvas.getContext('2d');
 
             function renderFrame() {
-                var array = new Uint8Array(anal.frequencyBinCount);
-                anal.getByteFrequencyData(array);
-                ctx.clearRect(0, 0, cw, ch);
-                for (var i = 0; i < bands; i++) {
-                    var barh = ch/255 * array[i];
-                    var gradient = ctx.createLinearGradient(0, ch-barh, 0, ch);
-                    gradient.addColorStop(0,   '#0BBFF430');
-                    gradient.addColorStop(0.5, '#003FD115');
-                    gradient.addColorStop(1,   '#00000007');
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(i*(mWidth+gap), ch - barh, mWidth, ch);
-                }
+                visu.effects[visu.fx](anal);
                 if (player) {
                     requestAnimationFrame(renderFrame);
                 } else {
@@ -38,12 +31,110 @@
             renderFrame();
         },
 
+        effects: [
+            // BARS
+            function(anal) {
+                var gap = 1;
+                var bands = Math.round(anal.frequencyBinCount * 5/7);
+                if (!visu.gradients) { // only create them once
+                    visu.gradients = Array();
+                    for (var i = 0; i < 256; i++) {
+                        visu.gradients[i] = visu.ctx.createLinearGradient(0, visu.ch - visu.ch/255*i, 0, visu.ch);
+                        visu.gradients[i].addColorStop(0,   '#0BBFF430');
+                        visu.gradients[i].addColorStop(0.5, '#003FD115');
+                        visu.gradients[i].addColorStop(1,   '#00000007');
+                    }
+                }
+
+                var array = new Uint8Array(anal.frequencyBinCount);
+                anal.getByteFrequencyData(array);
+                var mWidth = (visu.cw - bands * gap) / bands;
+                visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
+                for (var i = 0; i < bands; i++) {
+                    visu.ctx.fillStyle = visu.gradients[array[i]];
+                    visu.ctx.fillRect(
+                        i * (mWidth+gap), visu.ch - visu.ch/255 * array[i],
+                        mWidth, visu.ch
+                    );
+                }
+            },
+
+            // LINES
+            function(anal) {
+                var bands = Math.round(anal.frequencyBinCount * 5/7);
+                visu.ctx.strokeStyle = '#0BBFF420';
+                var array = new Uint8Array(anal.frequencyBinCount);
+                anal.getByteFrequencyData(array);
+                var mWidth = 4*visu.cw / bands;
+                // every n-th point, mirror and spline.
+                var npnts = new Array();
+                var x = 0;
+                for (var i = bands; i > 7; i-=8) {
+                    npnts.push([x, array[i]]);
+                    x += mWidth;
+                }
+                for (var i = 0; i < bands; i+=8) {
+                    npnts.push([x, array[i]]);
+                    x += mWidth;
+                }
+
+                // Scale & Draw
+                visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
+                visu.ctx.beginPath();
+                var fac = (visu.ch/255);
+                for (var l = 0.8; l > 0; l -= 0.03 + (0.8-l)/5) {
+                    visu.ctx.moveTo(0, visu.ch - npnts[0][1] * fac * l);
+                    visu.ctx.lineWidth = l*1.1;
+                    for (var p = 0; p < npnts.length-1; p += 1) {
+                        visu.ctx.bezierCurveTo(
+                            npnts[p][0]+mWidth/2, visu.ch - npnts[p][1] * fac * l,
+                            npnts[p][0]+mWidth/2, visu.ch - npnts[p+1][1] * fac * l,
+                            npnts[p+1][0], visu.ch - npnts[p+1][1] * fac * l
+                        );
+                        //visu.ctx.lineTo(npnts[p][0], visu.ch - npnts[p][1] * fac * l);
+                    }
+                    visu.ctx.stroke();
+                }
+            },
+
+            // OSC
+            function(anal) {
+                visu.ctx.lineWidth = 1.1;
+                hfac = 4;
+                var mWidth = visu.cw * hfac / anal.fftSize;
+                var array = new Uint8Array(anal.fftSize);
+                anal.getByteTimeDomainData(array);
+                visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
+
+                if (!visu.lali) visu.lali = new Array();
+                visu.lali.push(array);
+                while (visu.lali.length >= 20) visu.lali.shift();
+
+                for (var l = 0; l < visu.lali.length; l++) {
+                    visu.ctx.strokeStyle = 'rgba(11,191,244,'+(l/visu.lali.length/2)+')';
+                    visu.ctx.beginPath();
+                    visu.ctx.moveTo(0, visu.ch/2);
+                    for(var i = 0; i < visu.lali[l].length/hfac; i++) {
+                        visu.ctx.bezierCurveTo(
+                            i*mWidth + mWidth/2, visu.lali[l][i*hfac] * (visu.ch/255),
+                            i*mWidth + mWidth/2, visu.lali[l][(i+1)*hfac] * (visu.ch/255),
+                            (i+1)*mWidth, visu.lali[l][(i+1)*hfac] * (visu.ch/255)
+                        );
+                        //visu.ctx.lineTo(i*mWidth, visu.lali[l][i*hfac] * (visu.ch/255));
+                    }
+                    visu.ctx.stroke();
+                }
+            }
+        ],
+
+        rotate: function() {
+            visu.fx = (visu.fx+1) % visu.effects.length;
+        },
+
         stop: function() {
-            var canvas = document.getElementById('visu');
-            var cw = canvas.width;
-            var ch = canvas.height;
-            canvas.getContext('2d').clearRect(0, 0, cw, ch);
+            visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
         }
     };
+
 </script>
-<canvas id="visu" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:-2;"></canvas>
+<canvas id="visu" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:-2;" onclick="visu.rotate()"></canvas>

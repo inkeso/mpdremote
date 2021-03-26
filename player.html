@@ -50,7 +50,7 @@
     function toggl() {
         if (!player) {
             makeplayer();
-            if (visu && window.AudioContext) visu.start()
+            if (visu) visu.start()
         } else {
             removeplayer();
         }
@@ -63,5 +63,5 @@
 
 <div id="playerbox">
     <button id="plp" onclick="toggl();return false;">music_note</button>
-    <input id="slide" type="range" min="0.0" max="1.0" step="0.05" value="0.90" oninput="setvol(this.value)" width="100">
+    <input id="slide" type="range" min="0.0" max="1.0" step="0.05" value="0.75" oninput="setvol(this.value)" width="100">
 </div>
