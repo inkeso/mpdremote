@@ -36,6 +36,7 @@
         player.volume = $("#slide").value;
         remain = buffer;
         loading = window.setTimeout(delayedplay, delay);
+        if (visu) visu.start();
     }
     function removeplayer() {
         $('#plp').innerHTML = "music_note";
@@ -50,7 +51,7 @@
     function toggl() {
         if (!player) {
             makeplayer();
-            if (visu) visu.start()
+
         } else {
             removeplayer();
         }

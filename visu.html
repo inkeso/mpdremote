@@ -23,9 +23,10 @@
             function renderFrame() {
                 visu.effects[visu.fx](anal);
                 if (player) {
-                    requestAnimationFrame(renderFrame);
+                    window.setTimeout(()=>{requestAnimationFrame(renderFrame)}, 20);
                 } else {
-                    requestAnimationFrame(visu.stop);
+                    anal.disconnect();
+                    visu.clear();
                 }
             }
             renderFrame();
@@ -49,7 +50,8 @@
                 var array = new Uint8Array(anal.frequencyBinCount);
                 anal.getByteFrequencyData(array);
                 var mWidth = (visu.cw - bands * gap) / bands;
-                visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
+                if (mWidth < 2) mWidth = 2;
+                visu.clear();
                 for (var i = 0; i < bands; i++) {
                     visu.ctx.fillStyle = visu.gradients[array[i]];
                     visu.ctx.fillRect(
@@ -57,12 +59,12 @@
                         mWidth, visu.ch
                     );
                 }
+                visu.isclean = false;
             },
 
             // LINES
             function(anal) {
                 var bands = Math.round(anal.frequencyBinCount * 5/7);
-                visu.ctx.strokeStyle = '#0BBFF420';
                 var array = new Uint8Array(anal.frequencyBinCount);
                 anal.getByteFrequencyData(array);
                 var mWidth = 4*visu.cw / bands;
@@ -80,11 +82,13 @@
 
                 // Scale & Draw
                 visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
-                visu.ctx.beginPath();
+                visu.ctx.lineWidth = l*1.1;
                 var fac = (visu.ch/255);
                 for (var l = 0.8; l > 0; l -= 0.03 + (0.8-l)/5) {
+                    visu.ctx.strokeStyle = 'rgba(11,'+(191*(l+0.2))+',244,'+(l/2)+')';
+                    visu.ctx.beginPath();
                     visu.ctx.moveTo(0, visu.ch - npnts[0][1] * fac * l);
-                    visu.ctx.lineWidth = l*1.1;
+
                     for (var p = 0; p < npnts.length-1; p += 1) {
                         visu.ctx.bezierCurveTo(
                             npnts[p][0]+mWidth/2, visu.ch - npnts[p][1] * fac * l,
@@ -95,6 +99,7 @@
                     }
                     visu.ctx.stroke();
                 }
+                visu.isclean = false;
             },
 
             // OSC
@@ -104,36 +109,69 @@
                 var mWidth = visu.cw * hfac / anal.fftSize;
                 var array = new Uint8Array(anal.fftSize);
                 anal.getByteTimeDomainData(array);
-                visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
-
+                visu.clear();
                 if (!visu.lali) visu.lali = new Array();
                 visu.lali.push(array);
                 while (visu.lali.length >= 50) visu.lali.shift();
 
                 for (var l = 0; l < visu.lali.length; l++) {
-                    visu.ctx.strokeStyle = 'rgba(11,191,244,'+(l/visu.lali.length/2)+')';
+                    var f = l/visu.lali.length;
+                    visu.ctx.strokeStyle = 'rgba(11,'+(191*f)+',244,'+(f/2)+')';
                     visu.ctx.beginPath();
-                    visu.ctx.moveTo(0, visu.ch - visu.lali[l][0] * (visu.ch/255) * (l/visu.lali.length));
+                    visu.ctx.moveTo(0, visu.ch - visu.lali[l][0] * (visu.ch/255) * f);
                     for(var i = 0; i < visu.lali[l].length/hfac; i++) {
                         visu.ctx.bezierCurveTo(
-                            i*mWidth + mWidth/2, visu.ch - visu.lali[l][i*hfac] * (visu.ch/255) * (l/visu.lali.length),
-                            i*mWidth + mWidth/2, visu.ch - visu.lali[l][(i+1)*hfac] * (visu.ch/255) * (l/visu.lali.length),
-                            (i+1)*mWidth, visu.ch - visu.lali[l][(i+1)*hfac] * (visu.ch/255) * (l/visu.lali.length)
+                            i*mWidth + mWidth/2, visu.ch - visu.lali[l][i*hfac] * (visu.ch/255) * f,
+                            i*mWidth + mWidth/2, visu.ch - visu.lali[l][(i+1)*hfac] * (visu.ch/255) * f,
+                            (i+1)*mWidth, visu.ch - visu.lali[l][(i+1)*hfac] * (visu.ch/255) * f
                         );
                         //visu.ctx.lineTo(i*mWidth, visu.lali[l][i*hfac] * (visu.ch/255));
                     }
                     visu.ctx.stroke();
                 }
+                visu.isclean = false;
+            },
+
+            // METER
+            function(anal) {
+                var x1 = visu.cw/2;
+                if (!visu.bargrad) { // only create them once
+                    visu.bargrad = Array();
+                    for (var i = 0; i < 256; i++) {
+                        visu.bargrad[i] = visu.ctx.createLinearGradient(x1 - x1*(i/255), 0, x1 + x1*(i/255), 0);
+                        visu.bargrad[i].addColorStop(0.00, '#0BBFF440');
+                        visu.bargrad[i].addColorStop(0.25, '#003FD115');
+                        visu.bargrad[i].addColorStop(0.50, '#00000007');
+                        visu.bargrad[i].addColorStop(0.75, '#003FD115');
+                        visu.bargrad[i].addColorStop(1.00, '#0BBFF440');
+                    }
+                }
+                var ray = new Uint8Array(anal.frequencyBinCount);
+                anal.getByteFrequencyData(ray);
+                var avg = Math.floor(ray.reduce((a,b)=>a+b)/ray.length);
+                visu.clear();
+                visu.ctx.fillStyle = visu.bargrad[avg];
+                var f = avg/255;
+                visu.ctx.fillRect(x1 - x1*f, visu.ch-15, visu.cw*f, 15);
+                visu.isclean = false;
+            },
+
+            // OFF
+            function (anal) {
+                visu.clear();
             }
         ],
+
+        clear: function() {
+            if (!visu.isclean) {
+                visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
+                visu.isclean = true;
+            }
+        },
 
         rotate: function() {
             visu.fx = (visu.fx+1) % visu.effects.length;
         },
-
-        stop: function() {
-            visu.ctx.clearRect(0, 0, visu.cw, visu.ch);
-        }
     };
 
 </script>
