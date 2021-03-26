@@ -100,7 +100,7 @@
             // OSC
             function(anal) {
                 visu.ctx.lineWidth = 1.1;
-                hfac = 4;
+                hfac = 8;
                 var mWidth = visu.cw * hfac / anal.fftSize;
                 var array = new Uint8Array(anal.fftSize);
                 anal.getByteTimeDomainData(array);
@@ -108,17 +108,17 @@
 
                 if (!visu.lali) visu.lali = new Array();
                 visu.lali.push(array);
-                while (visu.lali.length >= 20) visu.lali.shift();
+                while (visu.lali.length >= 50) visu.lali.shift();
 
                 for (var l = 0; l < visu.lali.length; l++) {
                     visu.ctx.strokeStyle = 'rgba(11,191,244,'+(l/visu.lali.length/2)+')';
                     visu.ctx.beginPath();
-                    visu.ctx.moveTo(0, visu.ch/2);
+                    visu.ctx.moveTo(0, visu.ch - visu.lali[l][0] * (visu.ch/255) * (l/visu.lali.length));
                     for(var i = 0; i < visu.lali[l].length/hfac; i++) {
                         visu.ctx.bezierCurveTo(
-                            i*mWidth + mWidth/2, visu.lali[l][i*hfac] * (visu.ch/255),
-                            i*mWidth + mWidth/2, visu.lali[l][(i+1)*hfac] * (visu.ch/255),
-                            (i+1)*mWidth, visu.lali[l][(i+1)*hfac] * (visu.ch/255)
+                            i*mWidth + mWidth/2, visu.ch - visu.lali[l][i*hfac] * (visu.ch/255) * (l/visu.lali.length),
+                            i*mWidth + mWidth/2, visu.ch - visu.lali[l][(i+1)*hfac] * (visu.ch/255) * (l/visu.lali.length),
+                            (i+1)*mWidth, visu.ch - visu.lali[l][(i+1)*hfac] * (visu.ch/255) * (l/visu.lali.length)
                         );
                         //visu.ctx.lineTo(i*mWidth, visu.lali[l][i*hfac] * (visu.ch/255));
                     }
