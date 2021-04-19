@@ -104,10 +104,7 @@ let adder = {
     // get items, create list (diretory-based)
     items: function() {
         fetch("dir", this.currentpath, answer => {
-            //console.log(answer);
-            let IT = $("#itemlist");
-            //IT.replaceChildren();     // Webkit mag das nicht? Schade.
-            IT.innerHTML = "";
+            var IT = document.createDocumentFragment();
 
             // Add Directories
             answer.directories.forEach(d => {
@@ -123,6 +120,7 @@ let adder = {
             answer.files.forEach(f => {
                 IT.appendChild(this.filerow(f, showcd, showartist, false, adder.items));
             });
+            $("#itemlist").replaceChildren(IT);
 
             // Repurpose Search-field to add streams-urls
             let SR = $("#search");

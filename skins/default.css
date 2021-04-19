@@ -354,7 +354,17 @@ input[type=range]::-moz-range-thumb {
     padding: 0.25em;
     margin: 0;
     margin-bottom: 0.6em;
-    width: calc(100% - 0.5em);
+    width: calc(100% - 3em);
+}
+#add #searchX {
+    padding: 0.25em;
+    margin: 0;
+    margin-bottom: 0.6em;
+    border: none;
+    border-bottom: 1px solid var(--button-border);
+    background: var(--button-bg);
+    border-radius: 0;
+    color: var(--dim-text);
 }
 
 #add #itemlist .row {

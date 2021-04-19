@@ -244,6 +244,7 @@ pipapo. Ich weiß aber noch nicht, wie/ob damit sinnvoll interagiert werden kann
 
 
 # TODO
+ - Feedback beim Hinzufügen von stream-urls und dirs
  - Moar Layout(s) (s.o.)
 
 ## Ideen:

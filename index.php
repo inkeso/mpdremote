@@ -25,7 +25,9 @@ $mod = maymod();
 
 // |||=========================================================================\
 // ||| This is dirty and should be removed at some point, because there
-// ··· _are_ precision touch-devices out there (but not in our userbase)
+// ··· _are_ precision touch-devices out there (but not in our userbase).
+//      On the other hand, webkitgtk2 handles touchevents regardless of device,
+//      so this will falsely lead to usage of large interface in e.g. midori
 function pointercheck() {
     // since pointer-related mediaqueries may not be accurate
     // (looking at you, IceCat!)
@@ -165,7 +167,7 @@ document.addEventListener('DOMContentLoaded', event => {
 
     <div id="add" button="b_add">
         <div id="crumbtrail"></div>
-        <input id="search" name="search" placeholder="Suche..."/>
+        <input id="search" name="search" placeholder="Suche..."/><button id="searchX" onclick="$('#search').value='';">×</button>
         <div id="itemlist"></div>
     </div>
 

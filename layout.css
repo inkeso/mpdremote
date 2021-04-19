@@ -120,7 +120,7 @@ button {
 
 /* ***  ADD  ******************************************************** */
 #add #search {
-    display: block;
+    display: inline-block;
 }
 
 #add #itemlist .row {
