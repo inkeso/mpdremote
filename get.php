@@ -33,9 +33,10 @@ switch (count($_GET) ? array_keys($_GET)[0] : "current") {
         }
         // include playlist?
         // at least include next track, if any
-        $nexttrack = "";
+        $nexttrack = Array();
         if (array_key_exists($mpclient->current_track_id, $mpclient->playlist))
-            $nexttrack = $mpclient->playlist[$mpclient->current_track_id+1];
+            if (count($mpclient->playlist) > $mpclient->current_track_id+1)
+                $nexttrack = $mpclient->playlist[$mpclient->current_track_id+1];
         jout(array(
             'trackinfo' => $trinfo,
             'time' => $pos,

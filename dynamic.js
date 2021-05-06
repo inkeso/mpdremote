@@ -140,7 +140,8 @@ function updatecurrent() {
         }
         if (answer.next.file != currentinfo.next.file) {
             var v = answer.next;
-            $("#nextup").innerHTML = ("Artist" in v && v["Artist"] != null ? (v.Artist + " - ") : "") + v.Title;
+            $("#nextup").innerHTML = "Artist" in v && v["Artist"] != null ? (v.Artist + " - ") : ""
+            $("#nextup").innerHTML += "Title" in v && v["Title"] != null ? v.Title : "";
             if ("Time" in v) $("#nextup").innerHTML += " ["+parseInt(v.Time).humanTime()+"]";
             $("#nextup").attributes.trackid = v.Id;
         }
