@@ -10,15 +10,12 @@ let adder = {
     podcasts: [],       // contains names of podcast-bookmarks
 
     createcrumbtrail: function() {
+        let CT = document.createDocumentFragment();
         let root = elem("button", "" , [], "Music");
         root.addEventListener("click", ev => {
             adder.goto("");
             //$("#search").value="";
         });
-
-        let CT = $("#crumbtrail");
-        //CT.replaceChildren(root); // altes Webkit mag das nicht? Schade.
-        CT.innerHTML = ""
         CT.appendChild(root);
 
         let trail = this.currentpath.split("/");
@@ -30,6 +27,7 @@ let adder = {
             });
             CT.appendChild(crumb);
         }
+        $("#crumbtrail").replaceChildren(CT);
     },
 
     dirrow: function(d){
@@ -104,7 +102,7 @@ let adder = {
     // get items, create list (diretory-based)
     items: function() {
         fetch("dir", this.currentpath, answer => {
-            var IT = document.createDocumentFragment();
+            let IT = document.createDocumentFragment();
 
             // Add Directories
             answer.directories.forEach(d => {
@@ -116,7 +114,6 @@ let adder = {
             let nitm = answer.files.length;
             let showartist = (nart > 1 || nitm == 1);
             let showcd = new Set(answer.files.map(e=>e.Disc)).size > 1;
-
             answer.files.forEach(f => {
                 IT.appendChild(this.filerow(f, showcd, showartist, false, adder.items));
             });
@@ -145,12 +142,11 @@ let adder = {
             cmd+="&indir="+encodeURIComponent(this.currentpath);
         }
         fetch(cmd, null, (answer)=>{
-            let IT = $("#itemlist");
-            //IT.replaceChildren();
-            IT.innerHTML = "";
+            let IT = document.createDocumentFragment();
             answer.forEach(f => {
                 IT.appendChild(this.filerow(f, true, true, true));
             });
+            $("#itemlist").replaceChildren(IT);
             this.lifu = ()=>this.dosearch();
         });
     },

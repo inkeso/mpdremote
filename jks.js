@@ -5,7 +5,7 @@
 "use strict"
 
 // jQuery in a nutshell. v0.2
-function $(x) { 
+function $(x) {
     return x.startsWith("#")
         ? document.getElementById(x.substr(1))
         : document.querySelectorAll(x);
@@ -13,11 +13,19 @@ function $(x) {
 HTMLElement.prototype.$ = $;
 
 // Why not?!
-NodeList.prototype.filter = Array.prototype.filter;
+NodeList.prototype.filter = NodeList.prototype.filter || Array.prototype.filter;
 
 /**********************************************************************\
 * DOM helper and stuff                                                 *
 \**********************************************************************/
+
+// replaceChildren for older (mobile-)browsers
+if (!HTMLElement.prototype.replaceChildren) {
+    HTMLElement.prototype.replaceChildren = function(x) {
+        this.innerHTML = ""
+        while (x.children.length > 0) this.appendChild(x.firstChild);
+    }
+}
 
 // Create an HTML-Element with (optional) id, class(es), inner text
 function elem(tag, id="", cls=[], text="") {
