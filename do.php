@@ -40,7 +40,12 @@ switch (count($_GET) ? array_keys($_GET)[0] : "unknown") {
         break;
 
     case 'pause':
-        $mpclient->Pause();
+        // if not playing: play.
+        if ($mpclient->state != MPD_STATE_PLAYING) {
+            $mpclient->Play();
+        } else {
+            $mpclient->Pause();
+        }
         break;
 
     case 'skip':
