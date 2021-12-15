@@ -34,17 +34,16 @@ function podcast($what=null) {
         if (!isset($_SESSION["POD_".$what])) {
             $res = array();
             if ((strpos($pods[$what], "https://soundcloud.com") === 0)) {
-                // See https://developers.soundcloud.com/docs/api/reference
-                $key = "?client_id=".SOUNDCLOUDAPI;
-                $tracks = json_decode(file_get_contents("https://api.soundcloud.com/resolve".$key."&url=".urlencode($pods[$what])));
+                require_once("soundcloud.php");
+                $tracks = sc_tracklist(sc_resolve($pods[$what])->id);
                 $entries = array();
+                $baseuri = substr($_SERVER['SCRIPT_URI'], 0, strrpos($_SERVER['SCRIPT_URI'],"/"));
                 foreach ($tracks as $tr) {
                     $res[] = array(
-                        'file'=>$tr->permalink_url, // because we can use it
+                        'file'=> $baseuri."/scproxy.php?scid=".$tr->id,
                         'Title'=>$tr->title,
                         'Artist' => $tr->user->username,
-                        'Time' => round(intval($tr->duration)/1000),
-                        'soundcloud_track' => $tr->id // keep this to match filename in playlist
+                        'Time' => round(intval($tr->duration)/1000)
                     );
                 }
             } else { // assume plain RSS Podcast feed otherwise

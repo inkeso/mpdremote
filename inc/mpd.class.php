@@ -891,8 +891,10 @@ class mpd {
             if (strlen($title.$name.$artist)==0){
                 $fileItem['Title'] = $filename;
             } else {
-                $fileItem['Title'] = 'stream://'.$title.' '.$name.' '.$artist;
+                $fileItem['Title'] = $title.' '.$name;
+                $fileItem['Artist'] = $artist;
             }
+            if (!isset($fileItem['Album'])) $fileItem['Album'] = "[stream]";
         }
         if (!isset($fileItem['Title'])){
             $file_parts = explode('/', $filename);

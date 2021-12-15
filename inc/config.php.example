@@ -47,16 +47,24 @@ define("ACCESS", array(
  //    Soundcloud     //
 ///////////////////////
 
-define("SOUNDCLOUDAPI", "0123456789abcdefghijklmnopqrstuv");
-// get your API-key from https://developers.soundcloud.com/
-// you should also set this key (or a different one) in mpd.conf:
-/*
-playlist_plugin {
-    name "soundcloud"
-    enabled "true"
-    apikey "0123456789abcdefghijklmnopqrstuv"
-}
-*/
+// when no SOUNDCLOUD_CLIENT_ID is defined, soundcloud-support is disabled.
+
+// define only this to use older v2 API:
+define("SOUNDCLOUD_CLIENT_ID",      "beCreativeInGettingYourApiKeys01");
+
+// or define both of this to use v3 API:
+// define("SOUNDCLOUD_CLIENT_ID",      "00000NoApiKeysAvailableSince2017");
+// define("SOUNDCLOUD_CLIENT_SECRET",  "0123WeNeedAF0ck1ngApiKey00000000");
+
+// when using v3, you can also specify the file, the OAuth-token will be stored.
+// This is the default:
+// define("SOUNDCLOUD_TOKENFILE",      "/tmp/soundcloud-token");
+
+// v2 API should be preferred as long as it works since:
+// a) It's faster
+// b) Soundcloud itself is using v2 API on their homepage. And they also need a client_id 😇.
+
+
 
   ///////////////////////
  //  Error reporting  //
@@ -65,7 +73,7 @@ playlist_plugin {
 // I'm trying to not generate any notices or warnings, so show everything.
 error_reporting(E_ALL);
 
-// But do not show them, only print to log.
+// But do not display them, only print to log.
 ini_set('display_errors', "Off");
 
 ?>

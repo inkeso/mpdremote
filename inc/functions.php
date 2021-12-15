@@ -126,10 +126,26 @@ function addfiles($mpd, $fi) {
 
     // really add them
 
-    // Load soundcloud via plugin.
+    // soundcloud via plugin:
     // https://github.com/MusicPlayerDaemon/MPD/blob/master/src/playlist/plugins/SoundCloudPlaylistPlugin.cxx
+    //
+    // It is broken at the moment. We use our own streamproxy. Which is lacking metadata :/
+    // So we use a Playlist plugin to kind of fix this:
+
+    // transform direct track-links
     if (strpos($fi, "https://soundcloud.com") === 0) {
-        $mpd->PLLoad("soundcloud://url/".substr($fi, 8));
+        require_once("soundcloud.php");
+        $trackid = sc_resolve($fi)->id;
+        // all executable scripts are at basepath, so this works:
+        $baseuri = substr($_SERVER['SCRIPT_URI'], 0, strrpos($_SERVER['SCRIPT_URI'],"/"));
+        $fi = $baseuri."/scproxy.php?scid=$trackid";
+    }
+
+    // check for soundcloud-proxy links and load as playlist (scid → scpl)
+    $scpl = preg_match("#(http.*/scproxy.php)\\?scid=([0-9]+)#", $fi, $matches);
+    if ($scpl) {
+        require_once("soundcloud.php");
+        $mpd->PLLoad($matches[1]."?".SOUNDCLOUD_PLAYLISTFORMAT."&scpl=".$matches[2]);
     } else {
         addfiles_do($mpd, $fi);
     }

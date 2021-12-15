@@ -7,10 +7,6 @@ $mpmids = getMPMids();
 function addFromShuf($val) {
     global $mpmids;
     if (array_key_exists('Id', $val) && in_array($val['Id'], $mpmids)) $val['fromshuffle'] = true;
-
-    // Monkeypatch title for soundcloud... Until we have a better extractor.
-    $pattern = '#^https://cf-media.sndcdn.com/([^?]+)\?.*#';
-    $val['Title'] = preg_replace($pattern, 'Soundcloud ${1}', array_key_exists('Title', $val) ? $val['Title'] : '');
     return $val;
 }
 
@@ -94,14 +90,7 @@ switch (count($_GET) ? array_keys($_GET)[0] : "current") {
         if (strpos($_GET['dir'], "streams/") === 0 && !$dirfetch) { // virtual folder
             $name = explode("/", $_GET['dir'], 2)[1];
             foreach(podcast($name) as $k => $v) {
-                $inpl = false;
-                if (isset($v['soundcloud_track'])) {
-                    $scgrep = preg_grep("/.+api\\.soundcloud\\.com\\/tracks\\/".$v['soundcloud_track']."\\/stream.*/", $plfiles);
-                    if (count($scgrep) > 0) $inpl = array_keys($scgrep)[0];
-                } else {
-                    $inpl = array_search($v['file'], $plfiles);
-                }
-
+                $inpl = array_search($v['file'], $plfiles);
                 if ($inpl !== false) $v['inplaylist'] = $inpl - $mpclient->current_track_id;
                 $dir['files'][] = $v;
             }

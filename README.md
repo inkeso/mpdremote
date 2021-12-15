@@ -101,7 +101,7 @@ Laut & Luise	https://soundcloud.com/lautundluise/tracks
 ```
 Bei den Podcasts gehen die Links auf entweder einen podcast-konformen RSS-Feed
 oder eine soundcloud-seite aus der die dort gelisteten tracks extrahiert werden.
-Beachte auch die Hinweise zum soundcloud-API-key in der `config.php`.
+Beachte auch die Hinweise zum soundcloud-API-key in der `config.php.example`.
 
 #### get.php?podcastnames
 
