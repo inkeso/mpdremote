@@ -56,7 +56,6 @@ if (isset($_GET["scpl"])) { // output playlist... (we use this to set better met
     }
 
 
-
     // None of the supported playlist-formats supports artist, title and length.
     // prepending the stream with an id3v2-block doesn't work either for setting
     // correct metadata. ...Anybody an idea?

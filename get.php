@@ -97,13 +97,42 @@ switch (count($_GET) ? array_keys($_GET)[0] : "current") {
         }
         //  ****************************************************************
 
+        //  **** Special Folder NEU ****************************************
+        if ($_GET['dir'] == "NEU") { // add bookmarked streams & podcasts
+            $dir['directories'][] = "NEU/... 30 Tage";
+            $dir['directories'][] = "NEU/... 90 Tage";
+            $dir['directories'][] = "NEU/... 180 Tage";
+        }
+
+        if (strpos($_GET['dir'], "NEU/") === 0 && !$dirfetch) { // virtual folder
+            $name = explode("/", $_GET['dir'], 2)[1];
+            $days = preg_replace("/... ([0-9]+) Tage/", "\\1", $name);
+            $resi = $mpclient->Recent(time()-60*60*24*$days);
+            if (!is_null($resi) && isset($resi['files'])) {
+                foreach ($resi['files'] as $k => $v) {
+                    $inpl = array_search($v['file'], $plfiles);
+                    // relative to current song
+                    if ($inpl !== false) {
+                        $resi['files'][$k]['inplaylist'] = $inpl - $mpclient->current_track_id;
+                    }
+                }
+                // sort resi['files'] by "Last-Modified" descending
+                function cmp($a, $b) {
+                    return -strcmp($a["Last-Modified"], $b["Last-Modified"]);
+                }
+                $recfi = $resi['files'];
+                usort($recfi, "cmp");
+                $dir['files'] = $recfi;
+            }
+        }
+        //  ****************************************************************
+
         jout($dir);
         break;
 
     case 'search':
         $listing = array();
-        // ANY sucht in jedem Feld. Vielleicht wollen wir lieber 4x suchen:
-        // MPD_SEARCH_ARTIST, MPD_SEARCH_TITLE, MPD_SEARCH_ALBUM, MPD_SEARCH_FILENAME
+        // 'any' sucht in jedem Tag. Vielleicht wollen wir auch im filename suchen?
         $dir = isset($_GET['indir']) ? $_GET['indir'] : "";
         $resi = $mpclient->Search(MPD_SEARCH_ANY, $_GET['search'], $dir);
         if (!is_null($resi) && isset($resi['files'])) {

@@ -92,12 +92,19 @@ define("MPD_STATE_STOPPED", "stop");
 define("MPD_STATE_PAUSED",  "pause");
 
 // MPD Searching Constants
-define("MPD_SEARCH_ARTIST", "artist");
-define("MPD_SEARCH_TITLE",  "title");
-define("MPD_SEARCH_ALBUM",  "album");
-define("MPD_SEARCH_GENRE",  "genre");
-define("MPD_SEARCH_ANY",    "any");
-define("MPD_SEARCH_FILENAME","filename");
+define("MPD_SEARCH_ARTIST",     "artist");
+define("MPD_SEARCH_TITLE",      "title");
+define("MPD_SEARCH_ALBUM",      "album");
+define("MPD_SEARCH_GENRE",      "genre");
+define("MPD_SEARCH_ANY",        "any");
+define("MPD_SEARCH", array(
+    MPD_SEARCH_ARTIST,
+    MPD_SEARCH_TITLE,
+    MPD_SEARCH_ALBUM,
+    MPD_SEARCH_GENRE,
+    MPD_SEARCH_ANY
+));
+
 
 // MPD Cache Tables
 define("MPD_TBL_ARTIST","artist");
@@ -657,15 +664,13 @@ class mpd {
 
     /* Search()
      *
-     * Searches the MPD database. The search <type> should be one of the following:
-     *        MPD_SEARCH_ARTIST, MPD_SEARCH_TITLE, MPD_SEARCH_ALBUM
+     * Searches the MPD database. The search <type> should be one of MPD_SEARCH
      * The search <string> is a case-insensitive locator string. Anything that contains
      * <string> will be returned in the results.
      */
     function Search($type,$string,$dir="") {
         addLog("mpd->Search()");
-        if ( $type != MPD_SEARCH_ARTIST and  $type != MPD_SEARCH_ALBUM and
-             $type != MPD_SEARCH_ANY and     $type != MPD_SEARCH_TITLE ) {
+        if ( !in_array($type, MPD_SEARCH) ) {
             addErr( "mpd->Search(): invalid search type" );
             return NULL;
         } else {
@@ -687,20 +692,28 @@ class mpd {
         return $searchlist;
     }
 
+    function Recent($string) {
+        addLog("mpd->Search()");
+        $ver = explode(".",$this->mpd_version);
+        if (intval($ver[1]) >= 21 || intval($ver[0]) > 0) {
+            if (is_null($resp = $this->SendCommand(MPD_CMD_SEARCH, "(modified-since '$string')"))) return NULL;
+        } else {
+            if ( is_null($resp = $this->SendCommand(MPD_CMD_SEARCH,"modified-since",$string))) return NULL;
+        }
+        $searchlist = $this->_parseFileListResponse($resp);
+        addLog( "mpd->Search() / return ".print_r($searchlist,true) );
+        return $searchlist;
+    }
+
     /* Find()
      *
-     * Find() looks for exact matches in the MPD database. The find <type> should be one of
-     * the following:
-     *         MPD_SEARCH_ARTIST, MPD_SEARCH_TITLE, MPD_SEARCH_ALBUM
+     * Find() looks for exact matches in the MPD database. The find <type> should be one of MPD_SEARCH.
      * The find <string> is a case-insensitive locator string. Anything that exactly matches
      * <string> will be returned in the results.
      */
     function Find($type,$string) {
         addLog("mpd->Find()");
-        if ( $type != MPD_SEARCH_ARTIST and
-             $type != MPD_SEARCH_ALBUM and
-             $type != MPD_SEARCH_TITLE and
-             $type != MPD_SEARCH_GENRE) {
+        if ( !in_array($type, MPD_SEARCH) ) {
             $this->errStr = "mpd->Find(): invalid find type";
             return NULL;
         } else {

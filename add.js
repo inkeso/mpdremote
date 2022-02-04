@@ -114,8 +114,10 @@ let adder = {
             let nitm = answer.files.length;
             let showartist = (nart > 1 || nitm == 1);
             let showcd = new Set(answer.files.map(e=>e.Disc)).size > 1;
+            let isrecent = this.currentpath.startsWith("NEU/...");
+
             answer.files.forEach(f => {
-                IT.appendChild(this.filerow(f, showcd, showartist, false, adder.items));
+                IT.appendChild(this.filerow(f, showcd, showartist, isrecent));
             });
             $("#itemlist").replaceChildren(IT);
 

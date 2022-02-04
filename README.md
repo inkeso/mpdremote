@@ -74,7 +74,8 @@ MPD-root.
 
 Die subdirs im `dirs`-array enthalten den kompletten Pfad.
 
-In diesem Part passiert auch die Sonderbehandlung des Stream-ordners.
+##### Streams
+
 - Im Ordner "streams" werden zusätzlich zu den dort vorhandenen Dateien/Ordnern:
   - Streambookmarks aus der Datei hinter STREAMBOOKMARKS geladen
   - Ordern mit div. Streams (Podcasts) aus PODCASTS (siehe config.php) generiert
@@ -102,6 +103,13 @@ Laut & Luise	https://soundcloud.com/lautundluise/tracks
 Bei den Podcasts gehen die Links auf entweder einen podcast-konformen RSS-Feed
 oder eine soundcloud-seite aus der die dort gelisteten tracks extrahiert werden.
 Beachte auch die Hinweise zum soundcloud-API-key in der `config.php.example`.
+
+##### NEU / Recent
+
+Sonderbahndlung des Ordners "NEU": `get.php?dir=NEU/... <n> Tage` gibt alle
+Tracks (Absteigend nach Alter) zurück, die vor weniger als `<n>` Tagen
+modifiziert/hinzugefügt wurden. ("Presets" auf 30, 90, 180 Tage; siehe get.php)
+
 
 #### get.php?podcastnames
 
