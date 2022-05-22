@@ -876,7 +876,9 @@ class mpd {
         while ($res = $this->SendCommand('albumart', $filepath, strlen($data))) {
             $rx = explode("\n", $res, 3);
             if ($size === 0) $size = intval(explode(": ",$rx[0])[1]);
-            $readbytes = intval(explode(": ",$rx[1])[1]);
+            // Probably part of the problem: this fails sometimes
+            $xplo = explode(": ",$rx[1]);
+            $readbytes = count($xplo) > 1 ? intval($xplo[1]) : strlen($rx[2]);
             $data .= substr($rx[2], 0, $readbytes);
             if (strlen($data) >= $size) break;
         }
