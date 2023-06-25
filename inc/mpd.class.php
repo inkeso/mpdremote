@@ -1036,16 +1036,15 @@ class mpd {
         $this->repeat = $status['repeat'];
         $this->random = $status['random'];
         $this->db_last_refreshed = $stats['db_update'];
-        $this->volume = $status['volume'];
+        $this->volume = isset($status['volume']) ? $status['volume'] : FALSE;
         $this->uptime = $stats['uptime'];
         $this->playtime = $stats['playtime'];
         $this->num_songs_played = $stats['songs'];
         $this->num_artists = $stats['artists'];
         $this->num_songs = $stats['songs'];
         $this->num_albums = $stats['albums'];
-        $this->xfade = (isset($status['xfade']) ? $status['xfade'] : '');
-        if(isset($status['bitrate'])) $this->bitrate = $status['bitrate'];
-        else $this->bitrate = FALSE;
+        $this->xfade = isset($status['xfade']) ? $status['xfade'] : '';
+        $this->bitrate = isset($status['bitrate']) ? $status['bitrate'] : FALSE;
 
         return TRUE;
     }
