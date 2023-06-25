@@ -98,7 +98,7 @@ switch (count($_GET) ? array_keys($_GET)[0] : "current") {
         //  ****************************************************************
 
         //  **** Special Folder NEU ****************************************
-        if ($_GET['dir'] == "NEU") { // add bookmarked streams & podcasts
+        if ($_GET['dir'] == "NEU") { // show recently added songs
             $dir['directories'][] = "NEU/... 180 Tage";
         }
 

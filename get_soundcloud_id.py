@@ -7,6 +7,7 @@
 # and:
 # https://github.com/mozilla/geckodriver/releases → /opt/geckodriver
 
+import time
 from seleniumwire import webdriver
 from selenium.webdriver.firefox.service import Service
 
@@ -15,13 +16,14 @@ driver.get("https://soundcloud.com/")
 
 clid = None
 
-# Access requests via the `requests` attribute
-for request in driver.requests:
-    if request.url.startswith("https://api-v2.") \
-    and "client_id" in request.url \
-    and request.response.status_code == 200:
-        clid = request.url.split("client_id=",1)[1].split("&",1)[0]
-        break
+while clid is None:
+    for request in driver.requests:
+        if request.url.startswith("https://api-v2.") \
+        and "client_id" in request.url \
+        and request.response and request.response.status_code == 200:
+            clid = request.url.split("client_id=",1)[1].split("&",1)[0]
+            break
+    if clid is None: time.sleep(0.1)
 
 driver.quit()
 

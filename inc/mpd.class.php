@@ -1,10 +1,11 @@
 <?php
 /*
- * IKS 11/2020
+ * IKS 06/2023
  * - added new search syntax for mpd >= 0.21 to allow dir-based search:
  *      Search($type,$string) --> Search($type,$string,$dir="")
  * - cleaned up debugging/logging and some functions
  * - removed all other version-checks and deprecated stuff
+ * - changed constructor to work with PHP 8
  *
  * Sven Ginka 03/2010
  * Version mpd.class.php-1.3
@@ -159,11 +160,10 @@ class mpd {
 
     // =================== BEGIN OBJECT METHODS ================
 
-    /* mpd() : Constructor
-     *
+    /* 
      * Builds the MPD object, connects to the server, and refreshes all local object properties.
      */
-    function mpd($srv,$port,$pwd = NULL, $debug= FALSE ) {
+    function __construct($srv, $port, $pwd = NULL, $debug= FALSE) {
         $this->host = $srv;
         $this->port = $port;
         $this->password = $pwd;
@@ -375,7 +375,7 @@ class mpd {
         addLog( "mpd->GetDir()" );
         $resp = $this->SendCommand(MPD_CMD_LSDIR,$dir);
         $listArray = $this->_parseFileListResponse($resp);
-        if ($listArray==null) return null;
+        if ($listArray==null) return array("directories"=>array(), "playlists"=>array(), "files"=>array());
         // we have 3 differnt items: directory, playlist and file, sort them individually:
         // playlist and directory by name, files by msort (sorting by filename, see below)
         natcasesort($listArray['directories']);
@@ -730,7 +730,7 @@ class mpd {
      */
     function Disconnect() {
         addLog("mpd->Disconnect()");
-        fclose($this->mpd_sock);
+        if ($this->mpd_sock) fclose($this->mpd_sock);
         $this->connected = FALSE;
         unset($this->mpd_version);
         unset($this->errStr);

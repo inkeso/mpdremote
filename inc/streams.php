@@ -4,6 +4,11 @@
 
 
 function streambookmarks() {
+    if (!defined("STREAMBOOKMARKS")) return array();
+    if (!is_readable(STREAMBOOKMARKS)) {
+        trigger_error("File ".STREAMBOOKMARKS." not readable", E_USER_WARNING);
+        return array();
+    }
     // return a filelist of stream-bookmarks
     // ['file' => 'http://stream-url', 'Title' => "Stream!"]
     $res = array();
@@ -17,6 +22,11 @@ function streambookmarks() {
 }
 
 function podcast($what=null) {
+    if (!defined("PODCASTS")) return array();
+    if (!is_readable(PODCASTS)) {
+        trigger_error("File ".PODCASTS." not readable", E_USER_WARNING);
+        return array();
+    }
     // if $what is null, a list of podcasts (names) is returned.
     // Matching file-entries otherwise (cached in session).
     $res = array();
