@@ -1,6 +1,6 @@
 <script>
     var stream = "/bdhr/radio_hq.ogg"
-    var buffer = 4000; // milliseconds to prebuffer to avoid stream stutter.
+    var buffer = 2000; // milliseconds to prebuffer to avoid stream stutter.
     var delay = 100;  // pause between calls. doesn't really matter.
 
     var player = null;
@@ -64,5 +64,5 @@
 
 <div id="playerbox">
     <button id="plp" onclick="toggl();return false;">music_note</button>
-    <input id="slide" type="range" min="0.0" max="1.0" step="0.05" value="0.75" oninput="setvol(this.value)" width="100">
+    <input id="slide" type="range" min="0.0" max="1.0" step="0.05" value="0.90" oninput="setvol(this.value)" width="100">
 </div>

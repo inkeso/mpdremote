@@ -89,10 +89,6 @@ input  {
     transition: height .2s;
 }
 
-#controls {
-    margin-top:26px;
-}
-
 /* ***  Tabs  ******************************************* */
 #tabs {
     width:100%;
@@ -127,10 +123,14 @@ input  {
 
 /***  Controls  ******************************************* */
 #cinfo {
-    align-items:start;
+    align-items:center;
     grid-gap: .75em 0;
+    grid-template-rows: repeat(6, auto);
+    min-height: calc(100vh - 9em);
 }
-
+#cinfo #file, #cinfo #progressline, #cinfo #nextup {
+    align-items:center;
+}
 
 #albumart {
     /* display: none; */
@@ -147,7 +147,7 @@ input  {
 #artist        { color: #5f5; }
 #track         { color: #5ff; }
 #album         { color: #59f; }
-#file, #nextup { color: var(--main-text); }
+#file, #nextup { color: var(--dim-text); align-item: center; }
 
 #file {
     max-height: 4em;

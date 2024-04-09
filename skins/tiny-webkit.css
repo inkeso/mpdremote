@@ -5,5 +5,29 @@
 body, button, input {
     font-family: "Fix6x13web"; font-size: 13px; line-height:13px;
 }
+
+/* Tab-Bar (a bit off-grid, but that's fine) */
+#tabs { border-bottom: 1px solid #374C57; height: 16px; }
+#tabs button { height:16px; padding: 0; padding-bottom:3px;}
+
+#controls, #playlist, #add { margin-top:18px; }
+
+/* Controls-Tab */
+#albumart { display: none; }
+/* #albumart { max-width: 40px; max-height:40px; } */
+#cinfo { grid-gap: 1px; min-height: calc(100vh - 42px); }
+
+
+#cbuttons button { margin-top:6px; min-width: 72px; min-height: 13px; height: 13px; }
+#cbuttons { float: left; }
+#playerbox { float:right; margin-top: 6px; }
 #playerbox button { height: 13px; min-height: 13px; }
 input[type=range] { height: 13px; width: 102px; }
+/* Add-Tab */
+#add { margin-left: 0; margin-right:0; }
+#search { width: calc(100% - 12px); }
+#searchX { width:12px; }
+#itemlist .refresh { margin-right: 6px; margin-left:0; }
+#add #itemlist .row button.refresh { margin-left: 0; padding: 0; }
+#add #itemlist .row button.addir { padding: 0; }
+#add #itemlist .row { grid-template-columns: 36px 1fr 54px; }

@@ -99,7 +99,9 @@ switch (count($_GET) ? array_keys($_GET)[0] : "current") {
 
         //  **** Special Folder NEU ****************************************
         if ($_GET['dir'] == "NEU") { // show recently added songs
+            $dir['directories'][] = "NEU/... 30 Tage";
             $dir['directories'][] = "NEU/... 180 Tage";
+            $dir['directories'][] = "NEU/... 360 Tage";
         }
 
         if (strpos($_GET['dir'], "NEU/") === 0 && !$dirfetch) { // virtual folder
