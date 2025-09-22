@@ -943,7 +943,14 @@ class mpd {
                 }
                 $item = array();
             }
-            $item[$element] = $value;
+            // Consider multiple tags with same name (concatenate if unequal)
+            if (array_key_exists($element, $item)) {
+                if ($item[$element] != $value) {
+                    $item[$element] .= " ".$value;
+                }
+            } else {
+                $item[$element] = $value;
+            }
         }
         // check if there is a last item to store
         if (sizeof($item)>0){
