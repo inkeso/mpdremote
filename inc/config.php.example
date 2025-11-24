@@ -25,6 +25,7 @@ define("MAXFILESADD", 500);
 define("STREAMBOOKMARKS", "/srv/files/musik/streams/bookmarks");
 define("PODCASTS", "/srv/files/musik/streams/podcasts");
 
+
   ///////////////////////
  //  Access-controll  //
 ///////////////////////
@@ -42,29 +43,6 @@ define("ACCESS", array(
     )
 
 ));
-
-  ///////////////////////
- //    Soundcloud     //
-///////////////////////
-
-// when no SOUNDCLOUD_CLIENT_ID is defined, soundcloud-support is disabled.
-
-// define only this to use older v2 API:
-define("SOUNDCLOUD_CLIENT_ID",      "beCreativeInGettingYourApiKeys01");
-// Hint: soundcloud-homepage uses v2-API. Look at get_soundcloud_id.py
-
-// or define both of this to use v3 API:
-// define("SOUNDCLOUD_CLIENT_ID",      "00000NoApiKeysAvailableSince2017");
-// define("SOUNDCLOUD_CLIENT_SECRET",  "0123WeNeedAF0ck1ngApiKey00000000");
-
-// when using v3, you can also specify the file, the OAuth-token will be stored.
-// This is the default:
-// define("SOUNDCLOUD_TOKENFILE",      "/tmp/soundcloud-token");
-
-// v2 API should be preferred as long as it works since:
-// a) It's faster
-// b) Soundcloud itself is using v2 API on their homepage. And they also need a client_id 😇.
-
 
 
   ///////////////////////
