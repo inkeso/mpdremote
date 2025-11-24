@@ -229,10 +229,10 @@ wird immer vorher geladen. Dort sind KEINE Farb- oder Größenangaben!
 #### index.php?player[=visu][#play]
 
 Eine Streamabspielmöglichkeit kann per parameter `...&player` eingebunden werden.
-Damit das klappt, muss der Pfad in der `player.html` angepasst werden.
+Damit das klappt, muss der Pfad in der `inc/player.html` angepasst werden.
 
 Setzt man den Parameter `...&player=visu`, wird im Hintergrund der Seite eine
-Visualisierung dargestellt, sofern vom Browser unterstütz. (Siehe `visu.html`)
+Visualisierung dargestellt, sofern vom Browser unterstütz.
 
 Wenn man dann noch `#play` anhängt, wird der stream direkt beim laden gestartet.
 (Sofern der Browser das zulässt, meistens funktioniert das nicht)

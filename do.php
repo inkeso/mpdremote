@@ -77,7 +77,7 @@ switch (count($_GET) ? array_keys($_GET)[0] : "unknown") {
         break;
 
     case 'add':
-        if (strlen($_GET['add']) > 3) addfiles($mpclient, $_GET['add']);
+        if (strlen($_GET['add']) > 3) $mpclient->addfiles($_GET['add']);
         break;
 
     case 'refresh':

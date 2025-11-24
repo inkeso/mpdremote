@@ -1,25 +1,9 @@
 <?php
 require_once ("inc/header.php");
+require_once ("inc/streams.php");
+
 $mod = maymod();
-
-// don't want to check each property
-error_reporting(E_ALL & ~E_NOTICE);
-
-function get($what, $parm=null, $more=[]) {
-    $burl = substr($_SERVER['SCRIPT_URI'], 0, strrpos($_SERVER['SCRIPT_URI'], "static.php"));
-    $burl .= "/get.php?".$what;
-    if (!is_null($parm)) $burl .= "=".urlencode($parm);
-    foreach($more as $k => $v) $burl .= '&'.urlencode($k)."=".urlencode($v);
-    return json_decode(file_get_contents($burl));
-}
-
-function act($what, $parm=null) {
-    $burl = substr($_SERVER['SCRIPT_URI'], 0, strrpos($_SERVER['SCRIPT_URI'], "static.php"));
-    $burl .= "/do.php?".$what;
-    if (!is_null($parm)) $burl .= "=".urlencode($parm);
-    return json_decode(file_get_contents($burl));
-}
-
+$mpc = connect();
 
 // which tab?
 $tab = "c";
@@ -30,30 +14,28 @@ $stamp = "&stamp=".implode("-",hrtime());
 
 // handle actions
 if ($mod) {
-    if (isset($_GET["a"]) && in_array($_GET["a"], ['prev', 'next', 'pause'])) {
-        act($_GET["a"]);
-        // reload to avoid double-action on reload
-        header("Location: static.php?t=c".$stamp);
-        die();
+    foreach (['prev', 'next', 'pause'] as $a) {
+        if (isset($_GET[$a])) {
+            include "do.php";
+            header("Location: static.php?t=c".$stamp);
+            die();
+        }
     }
-
     foreach (["rm", "mv", "go"] as $a) {
         if (isset($_GET[$a])) {
-            act($a, $_GET[$a]);
-            // reload to avoid double-action on reload
+            include "do.php";
             header("Location: static.php?t=p".$stamp);
             die();
         }
     }
     foreach (["rmfile", "add", "refresh"] as $a) {
         if (isset($_GET[$a])) {
-            act($a, $_GET[$a]);
-            // reload to avoid double-action on reload
-            header("Location: static.php?t=a&dir=".urlencode($_GET["dir"]).$stamp);
+            include "do.php";
+            $dir = isset($_GET["dir"]) ? "&dir=".urlencode($_GET["dir"]) : "";
+            header("Location: static.php?t=a".$dir.$stamp);
             die();
         }
     }
-
 }
 
 ?><html><head>
@@ -123,57 +105,64 @@ if ($mod) {
   </tr>
 </table>
 <?php
+
+// get from array, with fallback if key don't exists
+function G($arr, $k, $def=null) {
+    return array_key_exists($k, $arr) ? $arr[$k] : $def;
+}
+
+
+
 switch($tab) {
     case 'c':  //////////////////////////////////////////////////////// Controls
-        $cti = get("current");
-        // display image or info?
-        $moreinfo = '<center><a href="?t=c&info'.$stamp.'"><img src="get.php?albumart&'.$cti->trackinfo->Id.'"></a></center>';
+        $cti = (object)$mpc->get_current();
+        $moreinfo = '<center><a href="?t=c&info'.$stamp.'"><img src="get.php?albumart&'.G($cti->trackinfo, 'Id').'"></a></center>';
         if (isset($_GET["info"])) {
             $moreinfo = '<a href="?t=c'.$stamp.'"><table>';
             $not = ['file', 'duration', 'Time', 'Artist', 'Title', 'Album', 'fromshuffle', 'Id'];
-            foreach (get_object_vars($cti->trackinfo) as $k=>$v) {
+            foreach ($cti->trackinfo as $k=>$v) {
                 if (in_array($k, $not)) continue;
                 $moreinfo .= "<tr><th>".htmlentities(str_replace("_", " ", $k))."</th><td>".htmlentities($v)."</td></tr>\n";
             }
             $moreinfo .= "</table></a>";
         }
         ?><table>
-          <tr><th>Artist</th><td width="100%"><?=$cti->trackinfo->Artist?></td>
+          <tr><th>Artist</th><td width="100%"><?=G($cti->trackinfo, "Artist")?></td>
               <td rowspan="6"><?=$moreinfo?></td>
           </tr>
-          <tr><th>Title</th><td><?=htmlentities($cti->trackinfo->Title)?></td></tr>
-          <tr><th>Album</th><td><?=htmlentities($cti->trackinfo->Album)?></td></tr>
-          <tr><th>File</th> <td><?=htmlentities($cti->trackinfo->file)?></td></tr>
+          <tr><th>Title</th><td><?=htmlentities(G($cti->trackinfo, "Title"))?></td></tr>
+          <tr><th>Album</th><td><?=htmlentities(G($cti->trackinfo, "Album"))?></td></tr>
+          <tr><th>File</th> <td><?=htmlentities(G($cti->trackinfo, "file"))?></td></tr>
           <tr><th>Time</th> <td><?=humanTime($cti->time)?> /
-                                <?=humanTime($cti->trackinfo->duration)?></td></tr>
-          <tr><th>Next</th> <td><?=htmlentities($cti->next->Artist)?> - <?=htmlentities($cti->next->Title)?></td></tr>
+                                <?=humanTime(G($cti->trackinfo, "duration", 0))?></td></tr>
+          <tr><th>Next</th> <td><?=htmlentities(G($cti->next, "Artist"))?> - <?=htmlentities(G($cti->next, "Title"))?></td></tr>
         </table>
         <?php
         if ($mod) { ?>
             <table>
-            <tr class="big"><th><a href="?a=prev<?=$stamp?>">&lt;&lt;</a></th>
-                <th><a href="?a=pause<?=$stamp?>"><?=$cti->state == "play" ? "||" : "&gt;"?></a></th>
-                <th><a href="?a=next<?=$stamp?>">&gt;&gt;</a></th>
+            <tr class="big"><th><a href="?prev<?=$stamp?>">&lt;&lt;</a></th>
+                <th><a href="?pause<?=$stamp?>"><?=$cti->state == "play" ? "||" : "&gt;"?></a></th>
+                <th><a href="?next<?=$stamp?>">&gt;&gt;</a></th>
             </tr>
             </table>
         <?php }
         break;
 
     case 'p':  //////////////////////////////////////////////////////// Playlist
-        $playlist = get("playlist");
+        $playlist = $mpc->get_playlist();
         echo "<table>";
         foreach ($playlist as $k => $v) {
             $dn = "&nbsp;";
-            if ($k < count($playlist)-1) $dn = '<a href="?mv='.$v->Id.','.$playlist[$k+1]->Id.$stamp.'">&nbsp;↓&nbsp;</a>';
+            if ($k < count($playlist)-1) $dn = '<a href="?mv='.G($v, 'Id').','.G($playlist[$k+1], 'Id').$stamp.'">&nbsp;↓&nbsp;</a>';
             $up = "&nbsp";
-            if ($k > 0) $up = '<a href="?mv='.$v->Id.','.$playlist[$k-1]->Id.$stamp.'">&nbsp;↑&nbsp;</a>';
-            $class = $v->fromshuffle ? "shuffle" : "file";
-            echo '<tr class="'.($v->currently ? "hilight" : "").'">';
+            if ($k > 0) $up = '<a href="?mv='.G($v, 'Id').','.G($playlist[$k-1], 'Id').$stamp.'">&nbsp;↑&nbsp;</a>';
+            $class = G($v, 'fromshuffle') ? "shuffle" : "file";
+            echo '<tr class="'.(G($v, 'currently') ? "hilight" : "").'">';
             echo '<th>'.$dn.'</th>';
             echo '<th>'.$up.'</th>';
-            echo '<th><a href="?rm='.$v->Id.$stamp.'">&nbsp;x&nbsp;</a></th>';
-            echo '<td width="100%"><a class="'.$class.'" href="?go='.$v->Id.$stamp.'">'.htmlentities($v->Artist).' - '.htmlentities($v->Title).'</a></td>';
-            echo '<td>'.humanTime($v->Time).'</td>';
+            echo '<th><a href="?rm='.G($v, 'Id').$stamp.'">&nbsp;x&nbsp;</a></th>';
+            echo '<td width="100%"><a class="'.$class.'" href="?go='.G($v, 'Id').$stamp.'">'.htmlentities(G($v, 'Artist')).' - '.htmlentities(G($v, 'Title')).'</a></td>';
+            echo '<td>'.humanTime(G($v, 'Time' ,0)).'</td>';
             echo "</tr>\n";
         }
         echo "</table>";
@@ -181,12 +170,12 @@ switch($tab) {
 
     case 'a':  ///////////////////////////////////////////////////////////// Add
         if ($mod) {
-            $cdir = $_GET["dir"];
-            $app = '&dir='.urlencode($cdir).$stamp;
+            $cdir = isset($_GET["dir"]) ? $_GET["dir"] : "";
+            $app = '&dir='.urlencode($cdir).$stamp.'&t=a';
             if (isset($_GET["search"]) && strlen($_GET["search"]) > 0) {
-                $alist = (object)['directories' => [], 'files' => get("search", $_GET["search"], ["indir"=>$cdir])];
+                $alist = (object)['directories' => [], 'files' => $mpc->get_search($_GET["search"], $cdir)];
             } else {
-                $alist = get("dir", $cdir);
+                $alist = (object)$mpc->get_dir($cdir);
             }
             // prepare crumbtrail
             $crumbs = '<a href="?t=a&dir='.$stamp.'">Music</a>';
@@ -197,53 +186,53 @@ switch($tab) {
             }
             echo '<form method="GET"><table><tr><td colspan="3">'.$crumbs.'</td></tr>'."\n";
             echo '<tr><td>Suche:</td><td colspan="2">';
-            echo '<input name="t" value="a" type="hidden"/>';
+            echo '<input name="search" style="width:100%" value="'.(isset($_GET["search"]) ? $_GET["search"] : "").'"/>';
             echo '<input name="dir" value="'.$cdir.'" type="hidden"/>';
-            echo '<input name="search" style="width:100%" value="'.$_GET["search"].'"/>';
+            echo '<input name="t" value="a" type="hidden"/>';
             echo '</td></tr>';
 
             // Show Dirs
-            $podcastnames = get("podcastnames");
+            $podcastnames = podcast();
             foreach ($alist->directories as $d) {
                 $ndir = urlencode($d);
                 $tdir = htmlentities($cdir ? substr($d, strrpos($d, "/")+1) : $d);
-                echo '<tr><th><a href="?t=a&refresh='.urlencode($d).$app.'" title="Refresh">[R]</a></th>';
-                echo '<td width="100%"><a href="?t=a&dir='.$ndir.$stamp.'">'.$tdir.'</a></td>';
+                echo '<tr><th><a href="?refresh='.urlencode($d).$app.'" title="Refresh">[R]</a></th>';
+                echo '<td width="100%"><a href="?dir='.$ndir.'&t=a'.$stamp.'">'.$tdir.'</a></td>';
                 $add = "&nbsp;";
                 if ($cdir && !in_array(substr($d, strrpos($d, "/")+1), $podcastnames)) {
-                    $add = '<a href="?t=a&add='.$ndir.$app.'">Add&nbsp;Dir</a>';
+                    $add = '<a href="?add='.$ndir.$app.'">Add&nbsp;Dir</a>';
                 }
                 echo '<td>'.$add.'</td></tr>';
             }
             // Show Files
             // First check for same artist
-            $art1 = $alist->files[0]->Artist;
             $same = count($alist->files) > 1;
+            $art1 = isset($alist->files[0]) ? G($alist->files[0], 'Artist') : "";
             foreach ($alist->files as $f) {
-                if ($f->Artist != $art1) {
+                if (G($f, 'Artist') != $art1) {
                     $same = false;
                     break;
                 }
             }
             // Now add to table
             foreach ($alist->files as $f) {
-                $inplaylist = property_exists($f, "inplaylist");
+                $inplaylist = G($f, "inplaylist");
                 echo '<tr class="'.($inplaylist ? "hilight" : "").'"><td>';
                 if ($inplaylist) {
-                    echo "[".$f->inplaylist."]";
-                    $link = '&rmfile='.urlencode($f->file);
+                    echo "[".$inplaylist."]";
+                    $link = 'rmfile='.urlencode($f['file']);
                 } else {
-                    echo $f->Track ? $f->Track : "&nbsp;";
-                    $link = '&add='.urlencode($f->file);
+                    echo G($f, 'Track', '&nbsp;');
+                    $link = 'add='.urlencode($f['file']);
                 }
-                echo '</td><td width="100%"><a class="file" href="?t=a'.$link.$app.'">';
-                if (!$same) echo htmlentities($f->Artist)." - ";
-                if ($f->Title) {
-                    echo htmlentities($f->Title);
+                echo '</td><td width="100%"><a class="file" href="?'.$link.$app.'">';
+                if (!$same) echo htmlentities(G($f, 'Artist'))." - ";
+                if (G($f, 'Title')) {
+                    echo htmlentities($f['Title']);
                 } else {
-                    echo substr($f->file, strrpos($f->file, "/")+1);
+                    echo substr($f['file'], strrpos($f['file'], "/")+1);
                 }
-                echo '</a></td><td>'.humanTime($f->Time).'</td></tr>';
+                echo '</a></td><td>'.humanTime(G($f, 'Time')).'</td></tr>';
             }
 
             echo '</table></form>';
@@ -258,6 +247,9 @@ switch($tab) {
         <?php }
         break;
 }
+
+$mpc->Disconnect();
+
 ?>
 
 </body></html>
