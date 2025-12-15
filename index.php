@@ -14,9 +14,11 @@ $mod = maymod();
     <meta http-equiv="Cache-Control" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="favicon.svg" />
     <link rel="stylesheet" type="text/css" href="layout.css" />
     <link rel="stylesheet" type="text/css" href="skins/<?=$skin?>.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#555555" />
     <script type="text/javascript" src="jks.js"></script>
     <script type="text/javascript" src="playlist.js"></script>
     <script type="text/javascript" src="add.js"></script>

@@ -1,0 +1,23 @@
+{
+	"name": "mpdremote",
+	"short_name": "mpdremote",
+	"description": "MPD remote",
+	"start_url": "./index.php",
+	"display": "standalone",
+	"background_color": "#555555",
+	"theme_color": "#333333",
+	"icons": [
+		{"src": "./favicon.svg", "sizes": "64x64" },
+		{"src": "./favicon.svg", "sizes": "128x128" },
+		{"src": "./favicon.svg", "sizes": "192x192" },
+		{"src": "./favicon.svg", "sizes": "256x256" },
+		{"src": "./favicon.svg", "sizes": "512x512" },
+		{"src": "./favicon.svg", "sizes": "any" }
+	],
+	"author": {
+		"name": "Inkeos",
+		"website": "https://nextlevel.dhis.org/mpdremote",
+		"github": "https://github.com/inkeso",
+		"source-repo": "https://github.com/inkeso/mpdremote"
+	}
+}

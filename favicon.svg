@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 135 135" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        rect   { clip-path: url(#clip);  fill: url(#bargrad);  width: 10.8px; }
+        circle { cx: 67.7px; cy: 67.7px; }
+    </style>
+    <defs>
+        <linearGradient id="bargrad" x1="0" y1="1" x2="0" y2="0">
+            <stop style="stop-color:#0bbff4;stop-opacity:.375" offset="0.0"/>
+            <stop style="stop-color:#003fd1;stop-opacity:.165" offset="0.5"/>
+            <stop style="stop-color:#000000;stop-opacity:.055" offset="1.1"/>
+        </linearGradient>
+        <linearGradient id="circgrad" x1="0" y1="0" x2="1" y2="1">
+            <stop style="stop-color:#f8fef2" offset="0"/>
+            <stop style="stop-color:#554f55" offset="1"/>
+        </linearGradient>
+        <clipPath id="clip"><circle r="56"/></clipPath>
+    </defs>
+    <circle r="64" style="fill:url(#circgrad)"/>
+    <circle r="56" style="fill:#555555"/>
+    <g transform="translate(0,135) scale(1,-1)">
+        <rect x= "19.4" height="87.1" />
+        <rect x= "31.7" height="76.7" />
+        <rect x= "44.0" height="60.4" />
+        <rect x= "56.3" height="106" />
+        <rect x= "68.6" height="81.8" />
+        <rect x= "80.9" height="86.9" />
+        <rect x= "93.2" height="92.4" />
+        <rect x="105.5" height="72.4" />
+    </g>
+    <path d="m45.4 38.8v55.9l56.7-27" style="fill:#f8fe64"/>
+</svg>
