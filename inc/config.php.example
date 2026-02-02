@@ -25,6 +25,18 @@ define("MAXFILESADD", 500);
 define("STREAMBOOKMARKS", "/srv/files/musik/streams/bookmarks");
 define("PODCASTS", "/srv/files/musik/streams/podcasts");
 
+// If you want to play Soundcloud-links or use it for podcasts, you may need an 
+// API-key. Login to your (free) soundcloud-account and register an app here:
+// https://soundcloud.com/you/apps
+// Set your tokens here:
+
+//define("SOUNDCLOUD_CLIENT", "---- your client ID here -------");
+//define("SOUNDCLOUD_SECRET", "---- your client secret here ---");
+
+// if SOUNDCLOUD_CLIENT and/or SOUNDCLOUD_SECRET is not defined, the old (v2)
+// fallback will be used, which will likely fail, because soundcloud lately
+// introduced captchas. YMMV.
+
 
   ///////////////////////
  //  Access-controll  //

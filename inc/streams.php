@@ -45,12 +45,12 @@ function podcast($what=null) {
             $res = array();
             if ((strpos($pods[$what], "https://soundcloud.com") === 0)) {
                 require_once("soundcloud.php");
-                $tracks = sc_tracklist(sc_resolve($pods[$what])->id);
+                $tracks = sc_tracklist(sc_resolve($pods[$what])->urn);
                 $entries = array();
                 $baseuri = substr($_SERVER['SCRIPT_URI'], 0, strrpos($_SERVER['SCRIPT_URI'],"/"));
                 foreach ($tracks as $tr) {
                     $res[] = array(
-                        'file'=> $baseuri."/scproxy.php?scid=".$tr->id,
+                        'file'=> $baseuri."/scproxy.php?scid=".$tr->urn,
                         'Title'=>$tr->title,
                         'Artist' => $tr->user->username,
                         'Time' => round(intval($tr->duration)/1000)

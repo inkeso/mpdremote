@@ -1,13 +1,14 @@
 <?php
+require_once ("inc/config.php");
 require_once ("inc/soundcloud.php");
 
 if (isset($_GET["scid"])) { // output data-stream...
-    $trackid = preg_replace("/[^0-9]/", "", $_GET["scid"]);
+    $trackid = preg_replace("/[^0-9a-zA-Z:_-]/", "", $_GET["scid"]);
     sc_stream($trackid);
 }
 
 if (isset($_GET["scpl"])) { // output playlist... (we use this to set better metadata)
-    $trackid = preg_replace("/[^0-9]/", "", $_GET["scpl"]);
+    $trackid = preg_replace("/[^0-9a-zA-Z:_-]/", "", $_GET["scpl"]);
     $thisurl = $_SERVER['SCRIPT_URI'];
     $meta = sc_track($trackid);
     // replace normal ascii ":" with special-unicode "∶"
@@ -20,12 +21,13 @@ if (isset($_GET["scpl"])) { // output playlist... (we use this to set better met
     if (isset($_GET["xspf"])) $format = "xspf";
     if (isset($_GET["m3u"])) $format = "m3u";
 
+    $filename = "sc_".str_replace(":", "_", $trackid).".".$format;
+    header('Content-Disposition: attachment; filename="'.$filename.'"');
     switch ($format) {
         case 'm3u':
             // PLS aka "audio/x-scpls" : Title and Length only
             // EXTM3U : Same but shorter...
             header('Content-Type: audio/x-mpegurl');
-            header('Content-Disposition: attachment; filename="sc_'.$trackid.'.m3u"');
             $name = "$artist - $title";
             echo "#EXTM3U\n#EXTINF:$seconds,$name\n$thisurl?scid=$trackid\n";
             break;
@@ -33,7 +35,6 @@ if (isset($_GET["scpl"])) { // output playlist... (we use this to set better met
         case 'xspf':
             // XSPF: Artist and Title, but no Length. MPD doesn't like this?
             header('Content-Type: application/xspf+xml');
-            header('Content-Disposition: attachment; filename="sc_'.$trackid.'.xspf"');
             echo '<?xml version="1.0" encoding="UTF-8"?>
             <playlist version="1" xmlns="http://xspf.org/ns/0/"><trackList><track>
               <title>'.htmlspecialchars($title).'</title>
@@ -45,7 +46,6 @@ if (isset($_GET["scpl"])) { // output playlist... (we use this to set better met
         case 'rss':
             // RSS: Artist and Title, but no Length. This works.
             header('Content-Type: application/rss+xml');
-            header('Content-Disposition: attachment; filename="sc_'.$trackid.'.rss"');
             echo '<?xml version="1.0" encoding="UTF-8" ?>
             <rss version="2.0"><channel><item>
               <title>'.htmlspecialchars($title).'</title>

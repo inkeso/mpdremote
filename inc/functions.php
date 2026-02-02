@@ -337,14 +337,14 @@ class mpdplus extends mpd {
         // transform direct track-links
         if (strpos($fi, "https://soundcloud.com") === 0) {
             require_once("soundcloud.php");
-            $trackid = sc_resolve($fi)->id;
+            $trackid = sc_resolve($fi)->urn;
             // all executable scripts are at basepath, so this works:
             $baseuri = substr($_SERVER['SCRIPT_URI'], 0, strrpos($_SERVER['SCRIPT_URI'],"/"));
             $fi = $baseuri."/scproxy.php?scid=$trackid";
         }
 
         // check for soundcloud-proxy links and load as playlist (scid → scpl)
-        $scpl = preg_match("#(http.*/scproxy.php)\\?scid=([0-9]+)#", $fi, $matches);
+        $scpl = preg_match("#(http.*/scproxy.php)\\?scid=([0-9a-zA-Z:_-]+)#", $fi, $matches);
         if ($scpl) {
             require_once("soundcloud.php");
             $this->PLLoad($matches[1]."?".SOUNDCLOUD_PLAYLISTFORMAT."&scpl=".$matches[2]);
