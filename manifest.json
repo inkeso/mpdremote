@@ -1,8 +1,9 @@
 {
-	"name": "mpdremote",
-	"short_name": "mpdremote",
+	"name": "mpd:re:mote",
+	"short_name": "mpd:re:mote",
 	"description": "MPD remote",
 	"start_url": "./index.php",
+	"id": "/mpdremote/",
 	"display": "standalone",
 	"background_color": "#555555",
 	"theme_color": "#333333",
@@ -15,7 +16,7 @@
 		{"src": "./favicon.svg", "sizes": "any" }
 	],
 	"author": {
-		"name": "Inkeos",
+		"name": "Inkeso",
 		"website": "https://nextlevel.dhis.org/mpdremote",
 		"github": "https://github.com/inkeso",
 		"source-repo": "https://github.com/inkeso/mpdremote"

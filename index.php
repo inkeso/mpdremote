@@ -59,8 +59,9 @@ function pointercheck() {
 pointercheck();
 // ---=========================================================================/
 
-
-
+// Redirect to player-mode when in PWA/Standalone. This is needed, because start_url in manifest.json is just a suggestion...
+const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if (isPWA && !location.search.includes("player")) location.replace(location.pathname + "?player");
 
 function showcontrols() {
     show("controls");

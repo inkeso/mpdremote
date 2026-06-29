@@ -94,7 +94,7 @@ if (defined("SOUNDCLOUD_CLIENT") && defined("SOUNDCLOUD_SECRET")) {
     }
 
 
-} else {    /// v2-API with scraped key. Defunct due to cpatchas. [2026-01]
+} else {    /// v2-API with scraped key. Defunct due to captchas. [2026-01]
 
     function get_scv2_key() {
         // extract all loaded javascript files from main page...

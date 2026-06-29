@@ -1,20 +1,20 @@
 <script>
-    var stream = "/bdhr/radio_hq.ogg"
-    var buffer = 2000; // milliseconds to prebuffer to avoid stream stutter.
-    var delay = 100;  // pause between calls. doesn't really matter.
+    const stream = "/bdhr/radio_hq.mp3";    // MP3 stream doesn't deconnect on random songchanges (unlike OGG)
+    var player = null;                      // keep player global for volume change and optional visu.
+    var visu = null;                        // visu can be  loaded optionally. see inc/visu.html
 
-    var player = null;
-    var loading = null;
-    var remain = buffer;
 
-    var visu = null;
+    // global vars for deleyed playback-start. 
+    // TODO: completely remove this.
+    // just show a CSS loading-animation and start as soon as possible.
+    var buffertime = 2000;              // milliseconds to prebuffer to avoid stream stutter.
+    var delay = 100;                    // pause between UI-loading calls. doesn't really matter.
+    var loading = null;                 // Loading animation timeout
+    var remain = buffertime;            // remaining prebuffer time
 
-    function setvol(fu) {
-        if (player) player.volume = fu;
-    }
     function delayedplay() {
         if (remain >= 0) {
-            $('#plp').innerHTML = '<div style="background:var(--button-text); width:'+(100-remain/buffer*100)+'%"></div>';
+            $('#plp').innerHTML = '<div style="background:var(--button-text); width:'+(100-remain/buffertime*100)+'%"></div>';
             remain -= delay
             loading = window.setTimeout(delayedplay, delay);
             return
@@ -30,14 +30,69 @@
         }
         loading = null;
     }
+
+
     function makeplayer() {
         if (loading) return;
+
+        // Pipeline: Source -> Compressor -> Gain -> Analyser -> Gain -> Destination
         player = new Audio(stream + "?" + Date.now());
-        player.volume = $("#slide").value;
-        remain = buffer;
+        const ctx = new AudioContext();
+        const source = ctx.createMediaElementSource(player);
+        const compressor = ctx.createDynamicsCompressor();
+        const autogain = ctx.createGain();
+        const analyser = ctx.createAnalyser();
+        const usergain = ctx.createGain();
+
+        compressor.threshold.value = -20;
+        compressor.knee.value = 20;
+        compressor.ratio.value = 4;
+        compressor.attack.value = 0.01;
+        compressor.release.value = 0.3;
+
+        // instead of RMS we could use LUFS / ITU-R BS.1770-4 here
+        // but that uses more CPU and may be overkill in this case
+        
+        autogain.gain.value = 1.0;
+        autogain.targetRMS = 0.10;  // target loudness
+        autogain.max = 2.5;         // max/min gain, about +-8 dB
+        autogain.min = 0.4;
+        autogain.speed = 0.5;       // in 1/s (2 sec is OK here)
+        analyser.fftSize = 4096;
+        analyser.smoothingTimeConstant = 0.85;
+        analyser.buffer = new Float32Array(analyser.fftSize);
+
+        player.setvol = (fu) => { usergain.gain.value = fu };
+
+        source.connect(compressor);
+        compressor.connect(autogain);
+        autogain.connect(analyser);
+        analyser.connect(usergain);
+        usergain.connect(ctx.destination);
+
+        let currentGain = 1.0;
+        function updateGain() {
+            analyser.getFloatTimeDomainData(analyser.buffer);
+            let sum = 0;
+            for (let i = 0; i < analyser.fftSize; i++) {
+                sum += analyser.buffer[i] ** 2;
+            }
+            const rms = Math.sqrt(sum / analyser.fftSize);
+            if (rms > 0.003) {
+                let desiredGain = autogain.targetRMS / rms;
+                desiredGain = Math.max(autogain.min, Math.min(autogain.max, desiredGain));
+                currentGain += (desiredGain - currentGain) * autogain.speed;
+                autogain.gain.setTargetAtTime(currentGain, ctx.currentTime, 0.5);
+            }
+            if (player) requestAnimationFrame(updateGain);
+        }
+        updateGain();
+
+        remain = buffertime;
         loading = window.setTimeout(delayedplay, delay);
         if (visu) visu.start();
     }
+
     function removeplayer() {
         $('#plp').innerHTML = "music_note";
         if (player) {
@@ -48,13 +103,10 @@
         if (loading) window.clearTimeout(loading);
         loading = null;
     }
-    function toggl() {
-        if (!player) {
-            makeplayer();
 
-        } else {
-            removeplayer();
-        }
+    function toggl() {
+        if (!player) { makeplayer(); }
+        else         { removeplayer(); }
     }
     // wenn "#play" dann autoplay (das kann der browser aber verhindern)
     if (location.hash == "#play") {
@@ -64,5 +116,5 @@
 
 <div id="playerbox">
     <button id="plp" onclick="toggl();return false;">music_note</button>
-    <input id="slide" type="range" min="0.0" max="1.0" step="0.05" value="0.90" oninput="setvol(this.value)" width="100">
+    <input id="slide" type="range" min="0.0" max="1.0" step="0.05" value="0.90" oninput="player && player.setvol(this.value)" width="100">
 </div>
