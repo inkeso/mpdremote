@@ -2,38 +2,10 @@
     const stream = "/bdhr/radio_hq.mp3";    // MP3 stream doesn't deconnect on random songchanges (unlike OGG)
     var player = null;                      // keep player global for volume change and optional visu.
     var visu = null;                        // visu can be  loaded optionally. see inc/visu.html
-
-
-    // global vars for deleyed playback-start. 
-    // TODO: completely remove this.
-    // just show a CSS loading-animation and start as soon as possible.
-    var buffertime = 2000;              // milliseconds to prebuffer to avoid stream stutter.
-    var delay = 100;                    // pause between UI-loading calls. doesn't really matter.
-    var loading = null;                 // Loading animation timeout
-    var remain = buffertime;            // remaining prebuffer time
-
-    function delayedplay() {
-        if (remain >= 0) {
-            $('#plp').innerHTML = '<div style="background:var(--button-text); width:'+(100-remain/buffertime*100)+'%"></div>';
-            remain -= delay
-            loading = window.setTimeout(delayedplay, delay);
-            return
-        }
-        var isplay = player.play();
-        $('#plp').innerHTML = "music_off";
-        if (isplay) {
-            isplay.catch(function(error) {
-                // $('#playerbox').innerHTML += "Playback not allowed by browser";
-                $('#plp').innerHTML = "music_note";
-                player = null;
-            });
-        }
-        loading = null;
-    }
-
+    var doAGC = true;                       // Automatic gain control is on by default
 
     function makeplayer() {
-        if (loading) return;
+        $('#plp').innerHTML = "more_horiz"
 
         // Pipeline: Source -> Compressor -> Gain -> Analyser -> Gain -> Destination
         player = new Audio(stream + "?" + Date.now());
@@ -52,17 +24,16 @@
 
         // instead of RMS we could use LUFS / ITU-R BS.1770-4 here
         // but that uses more CPU and may be overkill in this case
-        
         autogain.gain.value = 1.0;
         autogain.targetRMS = 0.10;  // target loudness
-        autogain.max = 2.5;         // max/min gain, about +-8 dB
-        autogain.min = 0.4;
-        autogain.speed = 0.5;       // in 1/s (2 sec is OK here)
+        autogain.max = 1.5;         // max +4dB
+        autogain.min = 0.4;         // min -8dB
+        autogain.speed = 0.333;     // 3 seconds is quite aggressive
         analyser.fftSize = 4096;
-        analyser.smoothingTimeConstant = 0.85;
+        analyser.smoothingTimeConstant = 0.75;
         analyser.buffer = new Float32Array(analyser.fftSize);
 
-        player.setvol = (fu) => { usergain.gain.value = fu };
+        player.setvol = (fu) => { usergain.gain.value = fu; };
 
         source.connect(compressor);
         compressor.connect(autogain);
@@ -71,26 +42,45 @@
         usergain.connect(ctx.destination);
 
         let currentGain = 1.0;
-        function updateGain() {
+        player.started = false;
+        player.updateGain = () => {
             analyser.getFloatTimeDomainData(analyser.buffer);
             let sum = 0;
             for (let i = 0; i < analyser.fftSize; i++) {
                 sum += analyser.buffer[i] ** 2;
             }
             const rms = Math.sqrt(sum / analyser.fftSize);
-            if (rms > 0.003) {
+            if (doAGC && rms > 0.003) {
                 let desiredGain = autogain.targetRMS / rms;
                 desiredGain = Math.max(autogain.min, Math.min(autogain.max, desiredGain));
                 currentGain += (desiredGain - currentGain) * autogain.speed;
-                autogain.gain.setTargetAtTime(currentGain, ctx.currentTime, 0.5);
+                autogain.gain.setTargetAtTime(currentGain, ctx.currentTime, 1/autogain.speed);
             }
-            if (player) requestAnimationFrame(updateGain);
+            if (!player.started && sum != 0) {
+                $('#plp').innerHTML = "music_off";
+                player.started = true;
+            }
+            if (!doAGC) autogain.gain.setTargetAtTime(1.0, ctx.currentTime, 1);
+            if ((!player.started || doAGC) && player) requestAnimationFrame(player.updateGain);
         }
-        updateGain();
+        player.updateGain();
 
-        remain = buffertime;
-        loading = window.setTimeout(delayedplay, delay);
-        if (visu) visu.start();
+        var isplay = player.play();
+        if (isplay) {
+            isplay.catch(function(error) {
+                // $('#playerbox').innerHTML += "Playback not allowed by browser";
+                $('#plp').innerHTML = "music_note";
+                player = null;
+            });
+        }
+        if (visu) visu.start(analyser);
+
+        /*// Show AGC (e.g. when adjusting parameters) ///
+        const dbg = $('#debug') || $('body')[0].appendChild(document.createElement("div"));
+        window.setInterval(() => {
+            dbg.innerText = "AGC " + "l".repeat(autogain.gain.value * 100) + " " + autogain.gain.value.toFixed(3);
+        }, 100);
+        /// Show AGC END //*/
     }
 
     function removeplayer() {
@@ -100,13 +90,26 @@
             player.remove();
         }
         player = null;
-        if (loading) window.clearTimeout(loading);
-        loading = null;
     }
 
     function toggl() {
         if (!player) { makeplayer(); }
         else         { removeplayer(); }
+    }
+    
+    function agc() {
+        if (doAGC) {
+            doAGC = false;
+            $('#arr').style.fill = "#7ffe64";
+            $('#off').style.display = "none";
+        } else {
+            doAGC = true;
+            $('#arr').style.fill = "#b1b1b1";
+            $('#off').style.display = "block";
+            if (player && player.started) {
+                requestAnimationFrame(player.updateGain);
+            }
+        }
     }
     // wenn "#play" dann autoplay (das kann der browser aber verhindern)
     if (location.hash == "#play") {
@@ -115,6 +118,31 @@
 </script>
 
 <div id="playerbox">
-    <button id="plp" onclick="toggl();return false;">music_note</button>
-    <input id="slide" type="range" min="0.0" max="1.0" step="0.05" value="0.90" oninput="player && player.setvol(this.value)" width="100">
+    <button id="plp" 
+            onclick="toggl();return false;" 
+            title="Start/Stop audio stream"
+            >music_note</button>
+    
+    <input  id="slide" 
+            oninput="player && player.setvol(this.value)" 
+            type="range" 
+            min="0.0" max="1.0" step="0.05" 
+            value="0.90" 
+            title="Volume control"
+            />
+    
+    <button id="agc" 
+            onclick="agc();return false;" 
+            title="Toggle automatic gain control"
+            ><svg version="1.1" viewBox="0 00 612 333" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" style="height:1em; display:block; margin:auto;">
+                <g transform="translate(0 -83) matrix(.6 0 0 .6 18 98)" style="fill:#f8fe64" >
+                    <path d="m221 9-112 112h-110v271h110l112 112h50v-494z"/>
+                    <path d="m344 138-34 34c47 47 47 122 0 169l34 34c65-65 65-171 0-237z"/>
+                    <path d="m428 53-34 34c45 45 70 105 70 169s-25 124-70 169l34 34c54-54 84-126 84-203s-30-149-84-203z"/>
+                </g>
+                <g transform="translate(110 0)">
+                    <path id="arr" d="m415 10-85 95 60-4 5 67-5 66-60-4 85 95 79-96-62 4-5-66 5-66 62 4z" style="fill:#b1b1b1"/>
+                    <path id="off" d="m362 30 112 270" style="fill:none; stroke-width:30; stroke:#f00"/>
+                </g>
+            </svg></button>
 </div>

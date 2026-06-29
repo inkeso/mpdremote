@@ -1,18 +1,9 @@
 <script>
-
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-
     visu = {
         fx: 0,
 
-        start: function() {
-            // Audio Stuff
-            var actx = new AudioContext();
-            var anal = actx.createAnalyser();
-            actx.createMediaElementSource(player).connect(anal);
-            anal.connect(actx.destination);
-            anal.fftSize = 512;
-            // Video Stuff
+        start: function(anal) {
+            // Initialize using a provided AudioContext Analyser
             var canvas = document.getElementById('visu');
             canvas.width  = canvas.getClientRects()[0].width;
             canvas.height = canvas.getClientRects()[0].height;
@@ -119,7 +110,7 @@
                     visu.ctx.strokeStyle = 'rgba(11,'+(191*f)+',244,'+(f/2)+')';
                     visu.ctx.beginPath();
                     visu.ctx.moveTo(0, visu.ch - visu.lali[l][0] * (visu.ch/255) * f);
-                    for(var i = 0; i < visu.lali[l].length/hfac; i++) {
+                    for(var i = 0; i < visu.lali[l].length/hfac; i+=10) {
                         visu.ctx.bezierCurveTo(
                             i*mWidth + mWidth/2, visu.ch - visu.lali[l][i*hfac] * (visu.ch/255) * f,
                             i*mWidth + mWidth/2, visu.ch - visu.lali[l][(i+1)*hfac] * (visu.ch/255) * f,
