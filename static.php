@@ -45,7 +45,12 @@ if ($mod) {
     <meta http-equiv="Cache-Control" content="no-cache" />
     <!--meta http-equiv="refresh" content="5"-->
     <meta http-equiv="Expires" content="-1" />
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="skins/favicon.svg" sizes="any"/>
+    <link rel="icon" href="skins/favi_32.png" sizes="32x32"/>
+    <link rel="icon" href="skins/favi_64.png" sizes="64x64"/>
+    <link rel="icon" href="skins/favi_128.png" sizes="128x128"/>
+    <link rel="icon" href="skins/favi_192.png" sizes="192x192"/>
+    <link rel="icon" href="skins/favi_256.png" sizes="256x256"/>
     <style>
         html,body,table {
             background:#222;
@@ -158,10 +163,14 @@ switch($tab) {
             if ($k > 0) $up = '<a href="?mv='.G($v, 'Id').','.G($playlist[$k-1], 'Id').$stamp.'">&nbsp;↑&nbsp;</a>';
             $class = G($v, 'fromshuffle') ? "shuffle" : "file";
             echo '<tr class="'.(G($v, 'currently') ? "hilight" : "").'">';
-            echo '<th>'.$dn.'</th>';
-            echo '<th>'.$up.'</th>';
-            echo '<th><a href="?rm='.G($v, 'Id').$stamp.'">&nbsp;x&nbsp;</a></th>';
-            echo '<td width="100%"><a class="'.$class.'" href="?go='.G($v, 'Id').$stamp.'">'.htmlentities(G($v, 'Artist')).' - '.htmlentities(G($v, 'Title')).'</a></td>';
+            $href = "";
+            if ($mod) {
+                echo '<th>'.$dn.'</th>';
+                echo '<th>'.$up.'</th>';
+                echo '<th><a href="?rm='.G($v, 'Id').$stamp.'">&nbsp;x&nbsp;</a></th>';
+                $href = 'href="?go='.G($v, 'Id').$stamp.'"';
+            }
+            echo '<td width="100%"><a class="'.$class.'" '.$href.'>'.htmlentities(G($v, 'Artist')).' - '.htmlentities(G($v, 'Title')).'</a></td>';
             echo '<td>'.humanTime(G($v, 'Time' ,0)).'</td>';
             echo "</tr>\n";
         }

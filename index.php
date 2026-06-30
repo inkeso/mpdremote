@@ -14,7 +14,12 @@ $mod = maymod();
     <meta http-equiv="Cache-Control" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="shortcut icon" href="favicon.svg" />
+    <link rel="shortcut icon" href="skins/favicon.svg" sizes="any"/>
+    <link rel="icon" href="skins/favi_32.png" sizes="32x32"/>
+    <link rel="icon" href="skins/favi_64.png" sizes="64x64"/>
+    <link rel="icon" href="skins/favi_128.png" sizes="128x128"/>
+    <link rel="icon" href="skins/favi_192.png" sizes="192x192"/>
+    <link rel="icon" href="skins/favi_256.png" sizes="256x256"/>
     <link rel="stylesheet" type="text/css" href="layout.css" />
     <link rel="stylesheet" type="text/css" href="skins/<?=$skin?>.css" />
     <link rel="manifest" href="manifest.json" />
