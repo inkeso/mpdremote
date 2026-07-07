@@ -148,6 +148,8 @@ function updatecurrent() {
         if (currentinfo.state != answer.state) {
             $("#playbutton").innerHTML = answer.state == "play" ? "pause" : "play_arrow"
         }
+        // Change window-title to »Artist – Title«
+        if (ti.Artist != cu.Artist || ti.Title != cu.Title) document.title = `${ti.Artist} – ${ti.Title} ▶ mp3:re:mote`
         currentinfo = answer;
     });
 }

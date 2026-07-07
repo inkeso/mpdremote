@@ -215,10 +215,12 @@ input  {
 
 #playerbox {
     margin-top: .25em;
-    width: 18.3em;
+    min-width: 18.3em;
+    width: fit-content;
+    
     margin:auto;
     button {
-        width:  48px;
+        width: 3em;
         height: 1.5em;
         vertical-align: bottom;
         font-family: 'Material Icons';
@@ -229,7 +231,7 @@ input  {
 
     input[type=range] {
         -webkit-appearance: none;
-        width: calc(18.3em - 110px);
+        width: 11.3em;
         height: calc(1.5em - 2px);
         vertical-align: bottom;
         padding: 0;
