@@ -1014,7 +1014,9 @@ class mpd {
             $statusStr=trim($statusStr);
             $statusLine = explode("\n", $statusStr );
             foreach ($statusLine as $line) {
-                list($element, $value) = explode(": ",$line);
+                $elva = explode(": ", $line);
+                $element = $elva[0];
+                $value = count($elva) > 1 ? $elva[1] : null;
                 $status[$element] = $value;
             }
         }
