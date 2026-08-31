@@ -28,7 +28,9 @@
         autogain.targetRMS = 0.10;  // target loudness
         autogain.max = 1.5;         // max +4dB
         autogain.min = 0.4;         // min -8dB
-        autogain.speed = 0.333;     // 3 seconds is quite aggressive
+        autogain.speeddn = 0.5;     // 2 seconds is quite aggressive, so try
+        autogain.speedup = 0.1;     // async: fast ramp down, slow ramp up
+        
         analyser.fftSize = 4096;
         analyser.smoothingTimeConstant = 0.75;
         analyser.buffer = new Float32Array(analyser.fftSize);
@@ -53,8 +55,10 @@
             if (doAGC && rms > 0.003) {
                 let desiredGain = autogain.targetRMS / rms;
                 desiredGain = Math.max(autogain.min, Math.min(autogain.max, desiredGain));
-                currentGain += (desiredGain - currentGain) * autogain.speed;
-                autogain.gain.setTargetAtTime(currentGain, ctx.currentTime, 1/autogain.speed);
+                let deltaGain = desiredGain - currentGain;
+                let speed = (deltaGain < 0 ? autogain.speeddn : autogain.speedup)
+                currentGain += deltaGain * speed;
+                autogain.gain.setTargetAtTime(currentGain, ctx.currentTime, 1/speed);
             }
             if (!player.started && sum != 0) {
                 $('#plp').innerHTML = "music_off";
