@@ -117,6 +117,7 @@ function updatecurrent() {
         ti.Title =  ("Title"  in ti && ti.Title)  ? ti.Title  : "\xa0";
         ti.Album =  ("Album"  in ti && ti.Album)  ? ti.Album  : "\xa0";
         ti.Time =   ("Time"   in ti && ti.Time)   ? parseInt(ti.Time) : 0;
+        if ("duration" in ti && ti.duration) ti.Time = parseInt(ti.duration);   // precedence over time, if present
 
         // update only what is different
         if (currentinfo.playlistcount != answer.playlistcount) $("#plcount").innerHTML = "("+answer.playlistcount+")";

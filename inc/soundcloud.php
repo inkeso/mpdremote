@@ -86,22 +86,40 @@ if (defined("SOUNDCLOUD_CLIENT") && defined("SOUNDCLOUD_SECRET")) {
     function sc_track($tid)     { return fetchjson("tracks/$tid"); }
 
     function sc_stream($trackid) {
-        $strms = fetchjson("tracks/$trackid/streams");
-        $otok = sc_get_token();
-        $options = array('header' => "Authorization: OAuth $otok\r\n");
-        $context = stream_context_create(array('http' => $options));
-        //readfile($strms->http_mp3_128_url, false, $context);
-        // Old http-stream endpoint is no more.
-        // So manually concat all HLS-playlist items to one stream:
-        //$m3u = file($strms->hls_aac_160_url, 0, $context);
-        $m3u = file($strms->hls_mp3_128_url, 0, $context);
-        foreach($m3u as $line) {
-            if (str_starts_with($line, "#EXT-X-MAP:URI")) {
-                $line = explode('"', $line)[1];
-            } else if (str_starts_with($line, "#")) {
-                continue;
+        // https://github.com/soundcloud/api/issues/578
+        // → some tracks don't work with streaming-API anymore.
+        if (SOUNDCLOUD_STREAM == NULL) {   /// API-Stream only
+            // https://developers.soundcloud.com/blog/api-streaming-urls
+            $strms = fetchjson("tracks/$trackid/streams");
+            $options = array('header' => "Authorization: OAuth ".sc_get_token()."\r\n");
+            $context = stream_context_create(array('http' => $options));
+            $m3u = file($strms->hls_aac_160_url, 0, $context);
+            if ($m3u == NULL) die();
+        } else {   /// Use YT-DLP (or other external script) as a hotfix instead
+            $strms = fetchjson("tracks/$trackid");
+            $link = preg_replace('/\?utm_.*/', "", $strms->permalink_url);
+            exec(str_replace("{}", $link, SOUNDCLOUD_STREAM), $m3url, $retcode);
+            if ($retcode > 0) {
+                trigger_error("ytdlp Soundcloud failed:\n".implode("\n", $m3url), E_USER_WARNING);
+                die();
             }
-            readfile(trim($line), false, $context);
+            $context = null;
+            $m3u = file($m3url[0]);
+        }
+
+        // Concat all HLS-playlist chunks to one stream:
+        if (count($m3u) < 2) {
+            trigger_error("Soundcloud stream failed:\n".implode("\n", $m3u), E_USER_WARNING);
+            die();
+        } else {
+            foreach($m3u as $line) {
+                if (str_starts_with($line, "#EXT-X-MAP:URI")) {
+                    $line = explode('"', $line)[1];
+                } else if (str_starts_with($line, "#")) {
+                    continue;
+                }
+                readfile(trim($line), false, $context);
+            }
         }
     }
 
